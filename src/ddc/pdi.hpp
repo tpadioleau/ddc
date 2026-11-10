@@ -4,6 +4,11 @@
 
 #pragma once
 
+//! @file
+//! @brief Utilities to expose DDC chunks, scalars and C-strings to PDI.
+//! Provides `ddc::PdiEvent`, which shares data with PDI for the duration of an event,
+//! and the `ddc::expose_to_pdi` helpers for exposing a single piece of data.
+
 #include <any>
 #include <array>
 #include <cstddef>
@@ -19,15 +24,29 @@
 
 namespace ddc {
 
+//! @addtogroup ddc_pdi
+//! @{
+
+//! Default PDI access mode deduced for a scalar passed as `T`:
+//! `PDI_INOUT` for a non-const lvalue reference, `PDI_OUT` otherwise.
+//! @tparam T The type (possibly a reference type) of the exposed scalar.
 template <class T>
 static constexpr PDI_inout_t default_access_v
         = (std::is_lvalue_reference_v<T> && !std::is_const_v<std::remove_reference_t<T>>)
                   ? PDI_INOUT
                   : PDI_OUT;
 
+//! Default PDI access mode deduced for a chunk passed as `T`:
+//! `PDI_INOUT` if `T` is a writable chunk (see `ddc::is_writable_chunk_v`), `PDI_OUT` otherwise.
+//! @tparam T The type (possibly a reference type) of the exposed chunk.
 template <class T>
 static constexpr PDI_inout_t chunk_default_access_v = is_writable_chunk_v<T> ? PDI_INOUT : PDI_OUT;
 
+//! Builds a PDI event: data registered with `with` are shared with PDI, and the event is
+//! triggered when the `PdiEvent` object is destroyed, after which the shared names are reclaimed.
+//!
+//! The object is neither copyable nor movable. It is typically used as a temporary,
+//! for example `ddc::PdiEvent("some_event").with("label", chunk.span_cview());`.
 class PdiEvent
 {
     std::string m_event_name;
@@ -55,12 +74,15 @@ class PdiEvent
     }
 
 public:
+    //! Creates an event that does not share any data yet.
+    //! @param[in] event_name Name of the PDI event triggered when this object is destroyed.
     explicit PdiEvent(std::string const& event_name);
 
     PdiEvent(PdiEvent const& rhs) = delete;
 
     PdiEvent(PdiEvent&& rhs) noexcept = delete;
 
+    //! Triggers the PDI event and reclaims every name shared through `with`.
     ~PdiEvent() noexcept;
 
     PdiEvent& operator=(PdiEvent const& rhs) = delete;
@@ -70,6 +92,15 @@ public:
     /// @{
     /// API with access argument
 
+    //! Shares a chunk with PDI using an explicit access mode.
+    //! The chunk is shared under `name`, its rank under `name + "_rank"` and its extents
+    //! (array of `std::size_t`) under `name + "_extents"`, both read-only for PDI.
+    //! The data are not copied: PDI accesses the memory of the chunk.
+    //! @tparam Access The PDI access mode (`PDI_IN`, `PDI_OUT` or `PDI_INOUT`) of the data.
+    //! @param[in] name Name under which the chunk is shared with PDI.
+    //! @param[in] data The borrowed chunk to share.
+    //! @return A reference to this event, to chain calls.
+    //! @pre If `Access` contains `PDI_IN`, the chunk must be writable (checked by `static_assert`).
     template <PDI_inout_t Access, concepts::borrowed_chunk BorrowedChunk>
     PdiEvent& with(std::string const& name, BorrowedChunk&& data)
     {
@@ -89,6 +120,14 @@ public:
         return *this;
     }
 
+    //! Shares an arithmetic scalar with PDI using an explicit access mode.
+    //! If `Access` does not contain `PDI_IN`, a copy of the value is shared instead of the
+    //! argument itself, which is then safe to pass as a temporary.
+    //! @tparam Access The PDI access mode (`PDI_IN`, `PDI_OUT` or `PDI_INOUT`) of the data.
+    //! @param[in] name Name under which the scalar is shared with PDI.
+    //! @param[in] data The arithmetic value to share.
+    //! @return A reference to this event, to chain calls.
+    //! @pre If `Access` contains `PDI_IN`, the argument must be a non-const lvalue (checked by `static_assert`).
     template <PDI_inout_t Access, class Arithmetic>
     PdiEvent& with(std::string const& name, Arithmetic&& data)
         requires(std::is_arithmetic_v<std::remove_reference_t<Arithmetic>>)
@@ -112,6 +151,10 @@ public:
     /// @{
 
     /// Borrowed chunk overload (Chunk (const)& or ChunkSpan&& or ChunkSpan (const)&)
+    /// The access mode is `chunk_default_access_v`.
+    /// @param[in] name Name under which the chunk is shared with PDI.
+    /// @param[in] data The borrowed chunk to share.
+    /// @return A reference to this event, to chain calls.
     template <concepts::borrowed_chunk BorrowedChunk>
     PdiEvent& with(std::string const& name, BorrowedChunk&& data)
     {
@@ -119,6 +162,10 @@ public:
     }
 
     /// Arithmetic overload
+    /// The access mode is `default_access_v`.
+    /// @param[in] name Name under which the scalar is shared with PDI.
+    /// @param[in] data The arithmetic value to share.
+    /// @return A reference to this event, to chain calls.
     template <class Arithmetic>
     PdiEvent& with(std::string const& name, Arithmetic&& data)
         requires(std::is_arithmetic_v<std::remove_reference_t<Arithmetic>>)
@@ -127,21 +174,39 @@ public:
     }
 
     /// C-string overload
+    /// The string is shared read-only under `name`, and its length (without the terminating
+    /// null character) under `name + "_size"`. The characters are not copied.
+    /// @param[in] name Name under which the string is shared with PDI.
+    /// @param[in] c_string Null-terminated string; it must outlive the event.
+    /// @return A reference to this event, to chain calls.
     PdiEvent& with(std::string const& name, char const* c_string);
 
     /// @}
 };
 
+//! Triggers a PDI event named `name` that shares `data` under the same name,
+//! with an explicit access mode.
+//! @tparam Access The PDI access mode (`PDI_IN`, `PDI_OUT` or `PDI_INOUT`) of the data.
+//! @param[in] name Name of both the event and the shared data.
+//! @param[in] data The chunk or arithmetic value to share.
+//! @see PdiEvent::with
 template <PDI_inout_t Access, class DataType>
 void expose_to_pdi(std::string const& name, DataType&& data)
 {
     PdiEvent(name).with<Access>(name, std::forward<DataType>(data));
 }
 
+//! Triggers a PDI event named `name` that shares `data` under the same name,
+//! with an access mode deduced from the type of `data`.
+//! @param[in] name Name of both the event and the shared data.
+//! @param[in] data The chunk, arithmetic value or C-string to share.
+//! @see PdiEvent::with
 template <class DataType>
 void expose_to_pdi(std::string const& name, DataType&& data)
 {
     PdiEvent(name).with(name, std::forward<DataType>(data));
 }
+
+//! @}
 
 } // namespace ddc

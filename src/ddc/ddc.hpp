@@ -33,6 +33,62 @@ static_assert(false, "DDC requires option -DKokkos_ENABLE_SYCL_RELOCATABLE_DEVIC
 namespace ddc {
 }
 
+//! @file
+//! @brief Umbrella header of the DDC core library, including all its public headers.
+//!
+//! Including this single header gives access to the whole `DDC::core` API. The optional components
+//! (`DDC::fft`, `DDC::splines` and `DDC::pdi`) must be included separately.
+//! @ingroup ddc_core_utils
+
+//! @defgroup ddc_core_utils Type system and core utilities
+//! @brief Compile-time type lists, tag utilities, the floating-point type selection and
+//! the scope guard managing the lifetime of the global discretization store.
+
+//! @defgroup ddc_containers Data containers and memory
+//! @brief Multi-dimensional containers associating values to the elements of a discrete domain,
+//! and the allocators used to manage their storage.
+
+//! @defgroup ddc_discretizations Discretizations
+//! @brief Discrete dimensions, their sampling of a continuous dimension, and the discrete domains
+//! built on top of them.
+
+//! @defgroup ddc_domains Discrete elements, vectors and domains
+//! @ingroup ddc_discretizations
+//! @brief Discrete elements, discrete vectors and the discrete domains that gather them.
+
+//! @defgroup ddc_samplings Samplings and discrete space
+//! @ingroup ddc_discretizations
+//! @brief Discrete dimensions, their coordinates, and the global discrete space storing their
+//! sampling.
+
+//! @defgroup ddc_algorithms Algorithms
+//! @brief Sequential and parallel algorithms iterating over discrete domains and containers.
+
+//! @defgroup ddc_output Output
+//! @brief Printing of containers and export to the NumPy format.
+
+//! @defgroup ddc_experimental Experimental API
+//! @brief Symbols defined in the `ddc::experimental` namespace.
+//!
+//! @warning The repository does not define a stability or compatibility policy for the
+//! `ddc::experimental` namespace. These symbols must not be assumed to follow the compatibility
+//! expectations of the rest of the library and may change between releases.
+
+//! @defgroup ddc_fft Fourier transform (DDC::fft)
+//! @brief Fast Fourier transform of containers, built on top of Kokkos-fft.
+//!
+//! This component is optional and provided by the `DDC::fft` CMake target.
+
+//! @defgroup ddc_splines Splines (DDC::splines)
+//! @brief B-splines, spline builders and evaluators, and the associated linear solvers.
+//!
+//! This component is optional and provided by the `DDC::splines` CMake target.
+
+//! @defgroup ddc_pdi PDI wrapper (DDC::pdi)
+//! @brief Exposure of DDC containers to PDI.
+//!
+//! This component is optional and provided by the `DDC::pdi` CMake target.
+
 // Misc
 #include <ddc/config.hpp>
 
