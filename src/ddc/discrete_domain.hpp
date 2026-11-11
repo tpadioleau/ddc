@@ -469,6 +469,7 @@ public:
 
     /// Construct a DiscreteDomain by copies and merge of domains
     //! @details The arguments are ignored: all the domains of zero dimensions are equal.
+    //! @param ... Discrete domains, ignored.
     template <class... DDoms>
     KOKKOS_FUNCTION constexpr explicit DiscreteDomain(DDoms const&... /*domains*/)
         requires(is_discrete_domain_v<DDoms> && ...)

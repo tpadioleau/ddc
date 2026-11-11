@@ -361,7 +361,8 @@ KOKKOS_FUNCTION Coordinate<typename DDim::continuous_dimension_type> distance_at
 
 //! @brief Coordinate of the first point of a discrete domain.
 //!
-//! @param[in] d A non-empty discrete domain of a non-uniform sampling.
+//! @details `d` is a non-empty discrete domain of a non-uniform sampling.
+//!
 //! @return The coordinate of `d.front()`.
 //! @pre The discrete space of `DDim` must be initialized.
 //!
@@ -375,7 +376,8 @@ KOKKOS_FUNCTION Coordinate<typename DDim::continuous_dimension_type> rmin(
 
 //! @brief Coordinate of the last point of a discrete domain.
 //!
-//! @param[in] d A non-empty discrete domain of a non-uniform sampling.
+//! @details `d` is a non-empty discrete domain of a non-uniform sampling.
+//!
 //! @return The coordinate of `d.back()`.
 //! @pre The discrete space of `DDim` must be initialized.
 //!
@@ -389,7 +391,8 @@ KOKKOS_FUNCTION Coordinate<typename DDim::continuous_dimension_type> rmax(
 
 //! @brief Length of the segment spanned by a discrete domain.
 //!
-//! @param[in] d A non-empty discrete domain of a non-uniform sampling.
+//! @details `d` is a non-empty discrete domain of a non-uniform sampling.
+//!
 //! @return The difference between rmax(d) and rmin(d).
 //! @pre The discrete space of `DDim` must be initialized.
 //!
