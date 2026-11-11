@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides serial transform-reduce algorithms over a discrete domain.
+
 #pragma once
 
 #include <array>
@@ -115,6 +118,15 @@ KOKKOS_FUNCTION T device_transform_reduce_serial(
 } // namespace detail
 
 /** A reduction over a nD domain in serial
+ *
+ * @details The reduction runs on the host, iterating over the multi-dimensional domain with the
+ * last dimension varying fastest (nested loops, in order of the dimensions of the domain).
+ *
+ * @return The reduction of the transformed values of all elements of the domain, starting from
+ * `neutral` (so `neutral` itself for an empty extent).
+ *
+ * @ingroup ddc_algorithms
+ *
  * @param[in] domain the range over which to apply the algorithm
  * @param[in] neutral the neutral element of the reduction operation
  * @param[in] reduce a binary FunctionObject that will be applied in unspecified order to the
@@ -138,6 +150,12 @@ T host_transform_reduce(
 }
 
 /** A reduction over a nD domain in serial. Can be called from a device kernel.
+ *
+ * @return The reduction of the transformed values of all elements of the domain, starting from
+ * `neutral` (so `neutral` itself for an empty extent).
+ *
+ * @ingroup ddc_algorithms
+ *
  * @param[in] domain the range over which to apply the algorithm
  * @param[in] neutral the neutral element of the reduction operation
  * @param[in] reduce a binary FunctionObject that will be applied in unspecified order to the

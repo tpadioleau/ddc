@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides an experimental function saving a ddc::ChunkSpan in the NumPy `.npy` format.
+
 #pragma once
 
 #include <complex>
@@ -117,6 +120,11 @@ namespace ddc::experimental {
  *
  * @param os Output stream receiving the .npy data.
  * @param chunk_span ChunkSpan to serialize.
+ *
+ * @details This function is experimental. The data is first copied to the host in a layout-right
+ * view, so the array is written in C order whatever the layout of `chunk_span`.
+ *
+ * @ingroup ddc_experimental
  */
 template <typename T, typename SupportType, typename LayoutStridedPolicy, typename MemorySpace>
 void save_npy(
@@ -135,6 +143,11 @@ void save_npy(
  *
  * @param filename Path to the output .npy file.
  * @param chunk_span ChunkSpan to serialize.
+ *
+ * @details This function is experimental. The data is first copied to the host in a layout-right
+ * view, so the array is written in C order whatever the layout of `chunk_span`.
+ *
+ * @ingroup ddc_experimental
  */
 template <typename T, typename SupportType, typename LayoutStridedPolicy, typename MemorySpace>
 void save_npy(

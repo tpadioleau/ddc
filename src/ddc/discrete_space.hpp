@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Global registry of discrete spaces: initialization and access by discrete dimension.
+
 #pragma once
 
 #include <cassert>
@@ -129,6 +132,16 @@ auto extract_after(Tuple&& t, std::index_sequence<Ids...>)
 /** Initialize (emplace) a global singleton discrete space
  *
  * @param args the constructor arguments
+ *
+ * @tparam DDim The discrete dimension whose discrete space is initialized.
+ *
+ * @throws std::runtime_error If the discrete space of `DDim` is already initialized.
+ *
+ * @details The discrete space is registered in the global store created by ddc::ScopeGuard (which
+ * must be alive) and is destroyed when the ScopeGuard is destroyed. With CUDA, HIP or SYCL, a copy
+ * of its device implementation is also made available to device code.
+ *
+ * @ingroup ddc_samplings
  */
 template <concepts::discrete_dimension DDim, class... Args>
 void init_discrete_space(Args&&... args)
@@ -166,6 +179,12 @@ void init_discrete_space(Args&&... args)
  *
  * @param a - the discrete space to move at index 0
  *          - the arguments to pass through at index 1
+ *
+ * @tparam DDim The discrete dimension whose discrete space is initialized.
+ *
+ * @return The element at index 1 of the tuple `a`.
+ *
+ * @ingroup ddc_samplings
  */
 template <concepts::discrete_dimension DDim, class DDimImpl, class Arg0>
 Arg0 init_discrete_space(std::tuple<DDimImpl, Arg0>&& a)
@@ -178,6 +197,12 @@ Arg0 init_discrete_space(std::tuple<DDimImpl, Arg0>&& a)
  *
  * @param a - the discrete space to move at index 0
  *          - the (2+) arguments to pass through in other indices
+ *
+ * @tparam DDim The discrete dimension whose discrete space is initialized.
+ *
+ * @return A tuple holding the elements of `a` at indices 1 and above.
+ *
+ * @ingroup ddc_samplings
  */
 template <concepts::discrete_dimension DDim, class DDimImpl, class Arg0, class Arg1, class... Args>
 std::tuple<Arg0, Arg1, Args...> init_discrete_space(std::tuple<DDimImpl, Arg0, Arg1, Args...>&& a)
@@ -190,6 +215,8 @@ std::tuple<Arg0, Arg1, Args...> init_discrete_space(std::tuple<DDimImpl, Arg0, A
  * @tparam DDim a discrete dimension
  * @return a boolean indicating whether DDim is initialized.
  * This function indicates whether a dimension is initialized.
+ *
+ * @ingroup ddc_samplings
  */
 template <concepts::discrete_dimension DDim>
 bool is_discrete_space_initialized() noexcept
@@ -202,6 +229,14 @@ bool is_discrete_space_initialized() noexcept
  * @return the discrete space instance associated with `DDim`.
  * This function must be called from a `KOKKOS_FUNCTION`.
  * Call `ddc::host_discrete_space` for a host-only function instead.
+ *
+ * @tparam MemorySpace The memory space of the returned implementation, by default the one of the
+ * current Kokkos execution context.
+ *
+ * @pre The discrete space must have been initialized (checked with `KOKKOS_ASSERT` for the host
+ * space).
+ *
+ * @ingroup ddc_samplings
  */
 template <concepts::discrete_dimension DDim, class MemorySpace = DDC_CURRENT_KOKKOS_SPACE>
 KOKKOS_FUNCTION detail::ddim_impl_t<DDim, MemorySpace> const& discrete_space()
@@ -225,6 +260,14 @@ KOKKOS_FUNCTION detail::ddim_impl_t<DDim, MemorySpace> const& discrete_space()
     }
 }
 
+//! @brief Gets the host implementation of the discrete space associated with a discrete dimension.
+//!
+//! @tparam DDim The discrete dimension.
+//! @return A const reference to the host implementation of the discrete space of `DDim`.
+//! @pre The discrete space of `DDim` must have been initialized (checked with `assert`).
+//! @note Host-only function, use ddc::discrete_space from a `KOKKOS_FUNCTION`.
+//!
+//! @ingroup ddc_samplings
 template <concepts::discrete_dimension DDim>
 detail::ddim_impl_t<DDim, Kokkos::HostSpace> const& host_discrete_space()
 {

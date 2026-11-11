@@ -2,6 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides ddc::parallel_transform_reduce, parallel reductions over discrete domains
+//! using Kokkos.
+
 #pragma once
 
 #include <cassert>
@@ -175,6 +179,15 @@ T transform_reduce_kokkos(
  *            results of transform, the results of other reduce and neutral.
  * @param[in] transform a unary FunctionObject that will be applied to each element of the input
  *            range. The return type must be acceptable as input to reduce
+ *
+ * @return The reduction, with `reduce`, of the values returned by `transform` for all elements of
+ * `domain` and of `neutral`.
+ *
+ * @note `reduce` must be one of the DDC reducers of ddc::reducer (such as ddc::reducer::sum), as
+ * it is converted to the corresponding Kokkos reducer. ddc::reducer::bxor is not implemented.
+ * The call is blocking: the result is returned once the Kokkos reduction is complete.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class ExecSpace, class Support, class T, class BinaryReductionOp, class UnaryTransformOp>
 T parallel_transform_reduce(
@@ -202,6 +215,15 @@ T parallel_transform_reduce(
  *            results of transform, the results of other reduce and neutral.
  * @param[in] transform a unary FunctionObject that will be applied to each element of the input
  *            range. The return type must be acceptable as input to reduce
+ *
+ * @return The reduction, with `reduce`, of the values returned by `transform` for all elements of
+ * `domain` and of `neutral`.
+ *
+ * @note `reduce` must be one of the DDC reducers of ddc::reducer (such as ddc::reducer::sum), as
+ * it is converted to the corresponding Kokkos reducer. ddc::reducer::bxor is not implemented.
+ * The call is blocking: the result is returned once the Kokkos reduction is complete.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class ExecSpace, class Support, class T, class BinaryReductionOp, class UnaryTransformOp>
 T parallel_transform_reduce(
@@ -229,6 +251,15 @@ T parallel_transform_reduce(
  *            results of transform, the results of other reduce and neutral.
  * @param[in] transform a unary FunctionObject that will be applied to each element of the input
  *            range. The return type must be acceptable as input to reduce
+ *
+ * @return The reduction, with `reduce`, of the values returned by `transform` for all elements of
+ * `domain` and of `neutral`.
+ *
+ * @note `reduce` must be one of the DDC reducers of ddc::reducer (such as ddc::reducer::sum), as
+ * it is converted to the corresponding Kokkos reducer. ddc::reducer::bxor is not implemented.
+ * The call is blocking: the result is returned once the Kokkos reduction is complete.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class Support, class T, class BinaryReductionOp, class UnaryTransformOp>
 T parallel_transform_reduce(
@@ -254,6 +285,15 @@ T parallel_transform_reduce(
  *            results of transform, the results of other reduce and neutral.
  * @param[in] transform a unary FunctionObject that will be applied to each element of the input
  *            range. The return type must be acceptable as input to reduce
+ *
+ * @return The reduction, with `reduce`, of the values returned by `transform` for all elements of
+ * `domain` and of `neutral`.
+ *
+ * @note `reduce` must be one of the DDC reducers of ddc::reducer (such as ddc::reducer::sum), as
+ * it is converted to the corresponding Kokkos reducer. ddc::reducer::bxor is not implemented.
+ * The call is blocking: the result is returned once the Kokkos reduction is complete.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class Support, class T, class BinaryReductionOp, class UnaryTransformOp>
 T parallel_transform_reduce(
@@ -360,6 +400,14 @@ TransformReducerChunkKokkosLambdaAdapter(
  *                   It must be compatible with the value type stored in `out`.
  * @param[in] transform unary function applied to each element of the reduction
  *                      subdomain. Its return type must be accepted by `reduce`.
+ *
+ * @pre `out.domain()` must be equal to the conversion of `domain` to the type of the domain of
+ * `out` (checked with `assert`).
+ *
+ * @note This function is experimental. It runs one Kokkos reduction per element of `out` on the
+ * host side loop, and `reduce` must be one of the DDC reducers of ddc::reducer.
+ *
+ * @ingroup ddc_experimental
  */
 template <
         class ExecSpace,

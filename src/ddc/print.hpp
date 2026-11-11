@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides functions printing ddc::ChunkSpan content and metadata to output streams.
+
 #pragma once
 
 #include <algorithm>
@@ -23,11 +26,24 @@
 
 namespace ddc {
 
+//! @brief Options controlling how much of a ChunkSpan is printed.
+//!
+//! @details Along a dimension, if the extent is smaller than `threshold` all the elements are
+//! printed. Otherwise only the first and last `edgeitems` elements are printed and the others are
+//! elided.
+//!
+//! @ingroup ddc_output
 struct PrinterOptions
 {
+    //! @brief Extent from which the elements along a dimension are elided (default 10).
     std::size_t threshold {10};
+    //! @brief Number of elements printed at each end of an elided dimension (default 3).
     std::size_t edgeitems {3};
 
+    //! @brief Compares two sets of options.
+    //!
+    //! @param[in] rhs The options to compare with.
+    //! @return `true` if both `threshold` and `edgeitems` are equal.
     bool operator==(PrinterOptions const& rhs) const noexcept;
 };
 
@@ -335,16 +351,38 @@ void print_dim_name(std::ostream& os, DiscreteVector<Dims...> const& dd)
  * current format if the option passed are invalid).
  * option is invalid if m_edgeitems >= (m_threshold / 2), in this case the
  * format isn't changed.
+ *
+ * @param[in] options The new printing options (by default, the default-constructed ones).
+ * @return The options in use before the call.
+ *
+ * @note When the options are invalid (`edgeitems >= threshold / 2` with integer division), the
+ * current options are kept and a message is written to `std::cerr`.
+ * @note The options are global to the process.
+ *
+ * @ingroup ddc_output
  */
 PrinterOptions set_print_options(PrinterOptions options = PrinterOptions());
 
 /**
  * Return the currently used format options
+ *
+ * @return The current global printing options.
+ *
+ * @ingroup ddc_output
  */
 PrinterOptions get_print_options();
 
 /**
  * Print the content of a ChunkSpan
+ *
+ * @param[in,out] os The output stream.
+ * @param[in] chunk_span The ChunkSpan whose elements are printed. Its content is copied to the
+ *            host in a layout-right view before printing.
+ * @return `os`.
+ *
+ * @note The elision of elements follows the options set with ddc::set_print_options.
+ *
+ * @ingroup ddc_output
  */
 template <class ElementType, class SupportType, class LayoutStridedPolicy, class MemorySpace>
 std::ostream& print_content(
@@ -383,6 +421,12 @@ std::ostream& print_content(
 
 /**
  * Print the metadata of a ChunkSpan (size, dimension name, ...)
+ *
+ * @param[in,out] os The output stream.
+ * @param[in] chunk_span The ChunkSpan whose metadata is printed.
+ * @return `os`.
+ *
+ * @ingroup ddc_output
  */
 template <class ElementType, class SupportType, class LayoutStridedPolicy, class MemorySpace>
 std::ostream& print_type_info(
@@ -402,6 +446,12 @@ std::ostream& print_type_info(
 
 /**
  * Print metadata and content of a ChunkSpan
+ *
+ * @param[in,out] os The output stream.
+ * @param[in] chunk_span The ChunkSpan to print.
+ * @return `os`.
+ *
+ * @ingroup ddc_output
  */
 template <class ElementType, class SupportType, class LayoutStridedPolicy, class MemorySpace>
 std::ostream& print(
@@ -420,6 +470,14 @@ std::ostream& print(
 /**
  * Print metadata and content of a ChunkSpan
  * Always print without elision, regardless of options set
+ *
+ * @param[in,out] os The output stream.
+ * @param[in] chunk_span The ChunkSpan to print.
+ * @return `os`.
+ *
+ * @note The global printing options are temporarily changed and restored afterwards.
+ *
+ * @ingroup ddc_output
  */
 template <class ElementType, class SupportType, class LayoutStridedPolicy, class MemorySpace>
 std::ostream& print_full(
@@ -440,6 +498,13 @@ std::ostream& print_full(
     return os;
 }
 
+//! @brief Prints the metadata and the content of a ChunkSpan, as ddc::print does.
+//!
+//! @param[in,out] os The output stream.
+//! @param[in] chunk_span The ChunkSpan to print.
+//! @return `os`.
+//!
+//! @ingroup ddc_output
 template <class ElementType, class SupportType, class LayoutStridedPolicy, class MemorySpace>
 std::ostream& operator<<(
         std::ostream& os,
