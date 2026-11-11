@@ -33,6 +33,18 @@ static_assert(false, "DDC requires option -DKokkos_ENABLE_SYCL_RELOCATABLE_DEVIC
 namespace ddc {
 }
 
+//! @namespace ddc::concepts
+//! @brief C++20 concepts used to constrain the templates of DDC.
+
+//! @namespace ddc::experimental
+//! @brief API without stability guarantee, which may change or be removed in any release.
+//!
+//! See the group @ref ddc_experimental.
+
+//! @namespace ddc::reducer
+//! @brief Binary reduction operations, such as ddc::reducer::sum, usable with
+//! ddc::transform_reduce and ddc::parallel_transform_reduce.
+
 //! @file
 //! @brief Umbrella header of the DDC core library, including all its public headers.
 //!
