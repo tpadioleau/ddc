@@ -166,6 +166,10 @@ public:
                 = allocation_mdspan_type(nullptr, other.m_allocation_mdspan.mapping());
     }
 
+    //! @brief Destructor, releases the memory of the chunk with its allocator.
+    //!
+    //! @details Nothing is released if the chunk does not hold an allocation, for example after it
+    //! has been moved from.
     ~Chunk() noexcept
     {
         if (this->m_allocation_mdspan.data_handle()) {
