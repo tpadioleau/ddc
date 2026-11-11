@@ -319,7 +319,7 @@ namespace concepts {
 template <class T>
 concept uniform_point_sampling = discrete_dimension<T> && is_uniform_point_sampling_v<T>;
 
-}
+} // namespace concepts
 
 //! @brief Prints the origin and step of a uniform sampling implementation to a stream.
 //!

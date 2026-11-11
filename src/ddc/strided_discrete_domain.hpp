@@ -65,7 +65,7 @@ namespace concepts {
 template <class T>
 concept strided_discrete_domain = is_strided_discrete_domain_v<T>;
 
-}
+} // namespace concepts
 
 namespace detail {
 

@@ -57,7 +57,7 @@ namespace concepts {
 template <class T>
 concept discrete_vector = is_discrete_vector_v<T>;
 
-}
+} // namespace concepts
 
 namespace detail {
 

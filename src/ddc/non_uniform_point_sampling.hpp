@@ -302,7 +302,7 @@ namespace concepts {
 template <class T>
 concept non_uniform_point_sampling = discrete_dimension<T> && is_non_uniform_point_sampling_v<T>;
 
-}
+} // namespace concepts
 
 //! @brief Prints a short description (the number of points) of a non-uniform sampling.
 //!

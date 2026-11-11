@@ -58,7 +58,7 @@ namespace concepts {
 template <class T>
 concept discrete_domain = is_discrete_domain_v<T>;
 
-}
+} // namespace concepts
 
 namespace detail {
 

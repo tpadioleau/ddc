@@ -62,7 +62,7 @@ namespace concepts {
 template <class T>
 concept borrowed_chunk = is_borrowed_chunk_v<T>;
 
-}
+} // namespace concepts
 
 //! @brief Gives access to the value, pointer and reference types of a chunk.
 //!

@@ -65,7 +65,7 @@ namespace concepts {
 template <class T>
 concept sparse_discrete_domain = is_sparse_discrete_domain_v<T>;
 
-}
+} // namespace concepts
 
 namespace detail {
 

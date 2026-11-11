@@ -357,7 +357,7 @@ namespace concepts {
 template <class T>
 concept periodic_sampling = discrete_dimension<T> && is_periodic_sampling_v<T>;
 
-}
+} // namespace concepts
 
 //! @brief Prints the origin and step of a periodic sampling implementation to a stream.
 //!

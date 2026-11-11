@@ -418,7 +418,7 @@ namespace concepts {
 template <class T>
 concept uniform_bsplines = discrete_dimension<T> && is_uniform_bsplines_v<T>;
 
-}
+} // namespace concepts
 
 template <class CDim, std::size_t D, bool Periodic>
 template <class DDim, class MemorySpace>
