@@ -10,7 +10,28 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '.github/workflows/pages.yaml'
+      - '.gitmodules'
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+      - 'docker/doxygen/**'
+      - 'docs/**'
+      - 'examples/**'
+      - 'src/**'
+      - 'vendor/**'
   pull_request:
+    paths:
+      - '.github/workflows/pages.yaml'
+      - '.gitmodules'
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+      - 'docker/doxygen/**'
+      - 'docs/**'
+      - 'examples/**'
+      - 'src/**'
+      - 'vendor/**'
+  workflow_dispatch:
 
 concurrency:
   group: ${{github.workflow}}-${{github.ref == github.ref_protected && github.run_id || github.event.pull_request.number || github.ref}}
@@ -26,8 +47,10 @@ jobs:
     steps:
       - name: Identify repository
         id: identify_repo
+        env:
+          IN_BASE_REPO: ${{(github.event_name != 'pull_request' && github.repository == 'CExA-project/ddc') || github.event.pull_request.head.repo.full_name == 'CExA-project/ddc'}}
         run: |
-          echo "in_base_repo=${{(github.event_name == 'push' && github.repository == 'CExA-project/ddc') || github.event.pull_request.head.repo.full_name == 'CExA-project/ddc'}}" >> "$GITHUB_OUTPUT"
+          echo "in_base_repo=${IN_BASE_REPO}" >> "$GITHUB_OUTPUT"
 
   docker-build:
     needs: id_repo
@@ -129,9 +152,10 @@ jobs:
           chmod a+rwx docs_out
           docker run -v ${PWD}:/src ghcr.io/cexa-project/ddc/doxygen:${GITHUB_SHA:0:7} bash /src/run.sh
       - name: Check for relevant documentation errors
+        if: github.event_name == 'pull_request'
         run: |
           # Get files which have changed in this merge request
-          git diff ${{github.event.pull_request.base.sha}}..HEAD --name-only --output=pull_diff.txt src/ddc/kernels/
+          git diff ${{github.event.pull_request.base.sha}}..HEAD --name-only --output=pull_diff.txt src/ddc/ docs/
           # Search through modified files to find relevant errors
           touch relevant_errors.txt
           while read f; do
@@ -188,26 +212,45 @@ jobs:
                 -D DDC_BUILD_DOCUMENTATION=ON \
                 -B build \
                 -S /src
-            cmake --build build --verbose --target doc || true
+            status=0
+            cmake --build build --verbose --target doc || status=\$?
             mv build/docs/html /src/docs_out
             mv build/docs/doxygen.log /src/docs_out/doxygen.log
+            exit \$status
           EOF
           mkdir docs_out
           chmod a+rwx docs_out
-          docker run -v ${PWD}:/src ghcr.io/cexa-project/ddc/doxygen:${GITHUB_SHA:0:7} bash /src/run.sh
+          status=0
+          docker run -v ${PWD}:/src ghcr.io/cexa-project/ddc/doxygen:${GITHUB_SHA:0:7} bash /src/run.sh || status=$?
           if [ -s docs_out/doxygen.log ]; then
             # The file is not-empty.
             head -n 30 docs_out/doxygen.log
             exit 1
           fi
+          if [ "${status}" -ne 0 ]; then
+            echo "Documentation build failed with status ${status}"
+            exit "${status}"
+          fi
+          if [ ! -f docs_out/html/index.html ]; then
+            echo "Documentation build did not produce docs_out/html/index.html"
+            exit 1
+          fi
+      - name: Upload site as artifact
+        if: ${{!cancelled()}}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: documentation-html
+          path: docs_out/html
+          if-no-files-found: warn
+          retention-days: 14
       - name: Checkout public branch
-        if: ${{github.event_name == 'push' && github.ref_name == 'main' && needs.id_repo.outputs.in_base_repo == 'true'}}
+        if: ${{(github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'main' && needs.id_repo.outputs.in_base_repo == 'true'}}
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           path: public
           ref: gh-pages
       - name: Publish site
-        if: ${{github.event_name == 'push' && github.ref_name == 'main' && needs.id_repo.outputs.in_base_repo == 'true'}}
+        if: ${{(github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'main' && needs.id_repo.outputs.in_base_repo == 'true'}}
         run: |
           find public -mindepth 1 -maxdepth 1 '!' -name .git -exec rm -rf '{}' '+'
           cp -a docs_out/html/* public/
