@@ -72,6 +72,8 @@ doxygen_add_docs(
     "${CMAKE_CURRENT_SOURCE_DIR}/uniform_heat_equation.md"
     "${CMAKE_CURRENT_SOURCE_DIR}/non_uniform_heat_equation.md"
     "${CMAKE_CURRENT_SOURCE_DIR}/concepts.md"
+    "${CMAKE_CURRENT_SOURCE_DIR}/architecture.md"
+    "${CMAKE_CURRENT_SOURCE_DIR}/error_handling.md"
     "${CMAKE_CURRENT_SOURCE_DIR}/heat_equation_spectral.md"
     "${CMAKE_CURRENT_SOURCE_DIR}/examples.md"
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake_integration.md"
