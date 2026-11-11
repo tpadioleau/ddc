@@ -24,14 +24,14 @@ digraph targets {
     edge [fontname="Helvetica", fontsize=9];
 
     core    [label="DDC::core", URL="\ref ddc_core_utils"];
-    fft     [label="DDC::fft\n(DDC_BUILD_KERNELS_FFT)", URL="\ref ddc_fft"];
-    splines [label="DDC::splines\n(DDC_BUILD_KERNELS_SPLINES)", URL="\ref ddc_splines"];
-    pdi     [label="DDC::pdi\n(DDC_BUILD_PDI_WRAPPER)", URL="\ref ddc_pdi"];
+    fft     [label="DDC::fft", URL="\ref ddc_fft"];
+    splines [label="DDC::splines", URL="\ref ddc_splines"];
+    pdi     [label="DDC::pdi", URL="\ref ddc_pdi"];
 
     node [shape=ellipse, style=dashed];
     kokkos  [label="Kokkos"];
     kfft    [label="Kokkos-fft"];
-    ginkgo  [label="Ginkgo, Kokkos Kernels,\nLAPACKE"];
+    ginkgo  [label="Ginkgo,\nKokkos Kernels,\nLAPACKE"];
     pdilib  [label="PDI"];
 
     core    -> kokkos;
@@ -44,12 +44,12 @@ digraph targets {
 }
 \enddot
 
-| Target         | Public headers                           | Entry header             |
-|----------------|------------------------------------------|--------------------------|
-| `DDC::core`    | `ddc/*.hpp`                              | `<ddc/ddc.hpp>`          |
-| `DDC::fft`     | `ddc/kernels/fft.hpp`                    | `<ddc/kernels/fft.hpp>`  |
-| `DDC::splines` | `ddc/kernels/splines.hpp`, `ddc/kernels/splines/*.hpp` | `<ddc/kernels/splines.hpp>` |
-| `DDC::pdi`     | `ddc/pdi.hpp`                            | `<ddc/pdi.hpp>`          |
+| Target         | CMake option                | Public headers                       | Entry header                |
+|----------------|-----------------------------|--------------------------------------|-----------------------------|
+| `DDC::core`    | always built                | `ddc/*.hpp`                          | `<ddc/ddc.hpp>`             |
+| `DDC::fft`     | `DDC_BUILD_KERNELS_FFT`     | `ddc/kernels/fft.hpp`                | `<ddc/kernels/fft.hpp>`     |
+| `DDC::splines` | `DDC_BUILD_KERNELS_SPLINES` | `ddc/kernels/splines/*.hpp`          | `<ddc/kernels/splines.hpp>` |
+| `DDC::pdi`     | `DDC_BUILD_PDI_WRAPPER`     | `ddc/pdi.hpp`                        | `<ddc/pdi.hpp>`             |
 
 Ginkgo, Kokkos Kernels and LAPACKE are private dependencies of `DDC::splines`: they are used by its
 compiled sources only and do not appear in its public headers' interface.
