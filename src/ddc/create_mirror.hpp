@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides the `create_mirror*` functions, creating mirrors of a ChunkSpan.
 #pragma once
 
 #include <type_traits>
@@ -40,9 +42,13 @@ auto create_layout_right_view_and_copy(
 
 } // namespace detail
 
+/// @brief Creates a Chunk with the same support as `src` in the memory space of `space`.
+///
+/// @details The values of the returned Chunk are uninitialized.
 /// @param[in] space A Kokkos memory space or execution space.
 /// @param[in] src A layout right ChunkSpan.
 /// @return a `Chunk` with the same support and layout as `src` allocated on the `Space::memory_space` memory space.
+/// @ingroup ddc_algorithms
 template <class Space, class ElementType, class Support, class Layout, class MemorySpace>
 auto create_mirror(
         [[maybe_unused]] Space const& space,
@@ -63,15 +69,19 @@ auto create_mirror(
 /// Equivalent to `create_mirror(Kokkos::HostSpace(), src)`.
 /// @param[in] src A layout right ChunkSpan.
 /// @return a `Chunk` with the same support and layout as `src` allocated on the `Kokkos::HostSpace` memory space.
+/// @ingroup ddc_algorithms
 template <class ElementType, class Support, class Layout, class MemorySpace>
 auto create_mirror(ChunkSpan<ElementType, Support, Layout, MemorySpace> const& src)
 {
     return create_mirror(Kokkos::HostSpace(), src);
 }
 
+/// @brief Creates a Chunk with the same support as `src` in the memory space of `space` and
+/// copies the values of `src` into it.
 /// @param[in] space A Kokkos memory space or execution space.
 /// @param[in] src A layout right ChunkSpan.
 /// @return a `Chunk` with the same support and layout as `src` allocated on the `Space::memory_space` memory space and operates a deep copy between the two.
+/// @ingroup ddc_algorithms
 template <class Space, class ElementType, class Support, class Layout, class MemorySpace>
 auto create_mirror_and_copy(
         Space const& space,
@@ -91,15 +101,20 @@ auto create_mirror_and_copy(
 /// Equivalent to `create_mirror_and_copy(Kokkos::HostSpace(), src)`.
 /// @param[in] src A layout right ChunkSpan.
 /// @return a `Chunk` with the same support and layout as `src` allocated on the `Kokkos::HostSpace` memory space and operates a deep copy between the two.
+/// @ingroup ddc_algorithms
 template <class ElementType, class Support, class Layout, class MemorySpace>
 auto create_mirror_and_copy(ChunkSpan<ElementType, Support, Layout, MemorySpace> const& src)
 {
     return create_mirror_and_copy(Kokkos::HostSpace(), src);
 }
 
+/// @brief Gives a ChunkSpan on `src` if it is accessible from `space`, or else creates a mirror
+/// Chunk in the memory space of `space`.
 /// @param[in] space A Kokkos memory space or execution space.
 /// @param[in] src A non-const, layout right ChunkSpan.
 /// @return If `MemorySpace` is accessible from `Space` then returns a copy of `src`, otherwise returns a `Chunk` with the same support and layout as `src` allocated on the `Space::memory_space` memory space.
+/// @note When no allocation is needed, the returned ChunkSpan views the same data as `src`.
+/// @ingroup ddc_algorithms
 template <class Space, class ElementType, class Support, class Layout, class MemorySpace>
 auto create_mirror_view(
         [[maybe_unused]] Space const& space,
@@ -124,15 +139,21 @@ auto create_mirror_view(
 /// Equivalent to `create_mirror_view(Kokkos::HostSpace(), src)`.
 /// @param[in] src A non-const, layout right ChunkSpan.
 /// @return If `Kokkos::HostSpace` is accessible from `Space` then returns a copy of `src`, otherwise returns a `Chunk` with the same support and layout as `src` allocated on the `Kokkos::HostSpace` memory space.
+/// @note When no allocation is needed, the returned ChunkSpan views the same data as `src`.
+/// @ingroup ddc_algorithms
 template <class ElementType, class Support, class Layout, class MemorySpace>
 auto create_mirror_view(ChunkSpan<ElementType, Support, Layout, MemorySpace> const& src)
 {
     return create_mirror_view(Kokkos::HostSpace(), src);
 }
 
+/// @brief Gives a ChunkSpan on `src` if it is accessible from `space`, or else creates a mirror
+/// Chunk in the memory space of `space` and copies the values of `src` into it.
 /// @param[in] space A Kokkos memory space or execution space.
 /// @param[in] src A layout right ChunkSpan.
 /// @return If `MemorySpace` is accessible from `Space` then returns a copy of `src`, otherwise returns a `Chunk` with the same support and layout as `src` allocated on the `Space::memory_space` memory space and operates a deep copy between the two.
+/// @note When no allocation is needed, the returned ChunkSpan views the same data as `src`.
+/// @ingroup ddc_algorithms
 template <class Space, class ElementType, class Support, class Layout, class MemorySpace>
 auto create_mirror_view_and_copy(
         [[maybe_unused]] Space const& space,
@@ -154,6 +175,8 @@ auto create_mirror_view_and_copy(
 /// Equivalent to `create_mirror_view_and_copy(Kokkos::HostSpace(), src)`.
 /// @param[in] src A layout right ChunkSpan.
 /// @return If `Kokkos::HostSpace` is accessible from `Space` then returns a copy of `src`, otherwise returns a `Chunk` with the same support and layout as `src` allocated on the `Kokkos::HostSpace` memory space and operates a deep copy between the two.
+/// @note When no allocation is needed, the returned ChunkSpan views the same data as `src`.
+/// @ingroup ddc_algorithms
 template <class ElementType, class Support, class Layout, class MemorySpace>
 auto create_mirror_view_and_copy(ChunkSpan<ElementType, Support, Layout, MemorySpace> const& src)
 {

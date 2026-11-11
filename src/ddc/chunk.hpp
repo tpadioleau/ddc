@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides Chunk, an owning multi-dimensional array defined on a discrete support.
 #pragma once
 
 #include <cassert>
@@ -26,13 +28,35 @@ namespace ddc {
 template <class ElementType, class, class Allocator = HostAllocator<ElementType>>
 class Chunk;
 
+//! @brief Marks Chunk as a chunk type, see enable_chunk.
+//!
+//! @tparam ElementType The type of the elements of the Chunk.
+//! @tparam SupportType The support type of the Chunk.
+//! @tparam Allocator The allocator type of the Chunk.
+//! @ingroup ddc_containers
 template <class ElementType, class SupportType, class Allocator>
 inline constexpr bool enable_chunk<Chunk<ElementType, SupportType, Allocator>> = true;
 
+//! @brief Owning multi-dimensional array of values defined on a discrete support.
+//!
+//! @details The memory is allocated at construction with the `allocate(label, size)` member of the
+//! allocator and released by the destructor with its `deallocate` member. The values are
+//! uninitialized after construction and stored in `Kokkos::layout_right` order. A Chunk can not be
+//! copied (use a deep copy instead) but can be moved: the moved-from Chunk no longer owns any
+//! memory. Use span_view() or ChunkSpan to obtain a non-owning view on the data.
+//!
+//! @tparam ElementType The type of the stored elements.
+//! @tparam SupportType The type of the support on which the values are defined, e.g. a
+//! DiscreteDomain.
+//! @tparam Allocator The allocator type, e.g. HostAllocator (default) or DeviceAllocator. It must
+//! provide the `value_type` and `memory_space` types, `allocate(label, size)` and
+//! `deallocate(pointer, size)`.
+//! @ingroup ddc_containers
 template <class ElementType, class SupportType, class Allocator>
 class Chunk : public ChunkCommon<ElementType, SupportType, Kokkos::layout_right>
 {
 protected:
+    //! @brief Type of the base class, ChunkCommon.
     using base_type = ChunkCommon<ElementType, SupportType, Kokkos::layout_right>;
 
 public:
@@ -53,30 +77,43 @@ public:
     /// The dereferenceable part of the co-domain but with indexing starting at 0
     using allocation_mdspan_type = base_type::allocation_mdspan_type;
 
+    //! @brief Type of the `Kokkos::mdspan` on the allocation with `const` elements.
     using const_allocation_mdspan_type = base_type::const_allocation_mdspan_type;
 
+    //! @brief Type of the support on which the values are defined.
     using discrete_domain_type = base_type::discrete_domain_type;
 
+    //! @brief Kokkos memory space in which the data is allocated.
     using memory_space = Allocator::memory_space;
 
+    //! @brief Type of the discrete elements of the support.
     using discrete_element_type = base_type::discrete_element_type;
 
+    //! @brief Type of the discrete vectors of the support.
     using discrete_vector_type = base_type::discrete_vector_type;
 
+    //! @brief Type of the extents of the underlying `Kokkos::mdspan`.
     using extents_type = base_type::extents_type;
 
+    //! @brief Layout policy of the underlying `Kokkos::mdspan`, `Kokkos::layout_right`.
     using layout_type = base_type::layout_type;
 
+    //! @brief Layout mapping of the underlying `Kokkos::mdspan`.
     using mapping_type = base_type::mapping_type;
 
+    //! @brief Type of the stored elements.
     using element_type = base_type::element_type;
 
+    //! @brief Type of the stored elements without `const` qualification.
     using value_type = base_type::value_type;
 
+    //! @brief Type used to express sizes and extents.
     using size_type = base_type::size_type;
 
+    //! @brief Type of the data handle (a pointer) of the underlying `Kokkos::mdspan`.
     using data_handle_type = base_type::data_handle_type;
 
+    //! @brief Type of the references to the stored elements.
     using reference = base_type::reference;
 
     template <class, class, class>
@@ -92,6 +129,9 @@ public:
     Chunk() = default;
 
     /// Construct a labeled Chunk on a domain with uninitialized values
+    /// @param[in] label The label of the allocation, returned by label().
+    /// @param[in] domain The support on which the values are defined.
+    /// @param[in] allocator The allocator providing the memory, kept by the chunk to release it.
     explicit Chunk(
             std::string const& label,
             SupportType const& domain,
@@ -103,6 +143,9 @@ public:
     }
 
     /// Construct a Chunk on a domain with uninitialized values
+    /// @details The label of the chunk is `"no-label"`.
+    /// @param[in] domain The support on which the values are defined.
+    /// @param[in] allocator The allocator providing the memory, kept by the chunk to release it.
     explicit Chunk(SupportType const& domain, Allocator allocator = Allocator())
         : Chunk("no-label", domain, std::move(allocator))
     {
@@ -152,6 +195,10 @@ public:
     }
 
     /// Slice out some dimensions
+    /// @param[in] slice_spec The offsets, from the front of the support, at which to slice along
+    /// the dimensions `QueryDDims`.
+    /// @return A read-only ChunkSpan on the data of this chunk, without the dimensions
+    /// `QueryDDims`.
     template <concepts::discrete_dimension... QueryDDims>
     auto operator[](DiscreteVector<QueryDDims...> const& slice_spec) const
     {
@@ -159,6 +206,9 @@ public:
     }
 
     /// Slice out some dimensions
+    /// @param[in] slice_spec The offsets, from the front of the support, at which to slice along
+    /// the dimensions `QueryDDims`.
+    /// @return A ChunkSpan on the data of this chunk, without the dimensions `QueryDDims`.
     template <concepts::discrete_dimension... QueryDDims>
     auto operator[](DiscreteVector<QueryDDims...> const& slice_spec)
     {
@@ -166,6 +216,10 @@ public:
     }
 
     /// Slice out some dimensions
+    /// @param[in] slice_spec The position, in the support, at which to slice along the dimensions
+    /// `QueryDDims`.
+    /// @return A read-only ChunkSpan on the data of this chunk, without the dimensions
+    /// `QueryDDims`.
     template <concepts::discrete_dimension... QueryDDims>
     auto operator[](DiscreteElement<QueryDDims...> const& slice_spec) const
     {
@@ -173,6 +227,9 @@ public:
     }
 
     /// Slice out some dimensions
+    /// @param[in] slice_spec The position, in the support, at which to slice along the dimensions
+    /// `QueryDDims`.
+    /// @return A ChunkSpan on the data of this chunk, without the dimensions `QueryDDims`.
     template <concepts::discrete_dimension... QueryDDims>
     auto operator[](DiscreteElement<QueryDDims...> const& slice_spec)
     {
@@ -180,6 +237,8 @@ public:
     }
 
     /// Slice out some dimensions
+    /// @param[in] odomain The subdomain to which the chunk is restricted.
+    /// @return A read-only ChunkSpan on the data of this chunk, restricted to `odomain`.
     template <concepts::discrete_dimension... QueryDDims>
     auto operator[](DiscreteDomain<QueryDDims...> const& odomain) const
         requires(is_discrete_domain_v<SupportType>)
@@ -188,6 +247,8 @@ public:
     }
 
     /// Slice out some dimensions
+    /// @param[in] odomain The subdomain to which the chunk is restricted.
+    /// @return A ChunkSpan on the data of this chunk, restricted to `odomain`.
     template <concepts::discrete_dimension... QueryDDims>
     auto operator[](DiscreteDomain<QueryDDims...> const& odomain)
         requires(is_discrete_domain_v<SupportType>)
@@ -331,26 +392,46 @@ public:
                 typename Allocator::memory_space>(s.data_handle(), kokkos_layout);
     }
 
+    //! @brief Gives a read-only view on the data of this chunk.
+    //!
+    //! @return A ChunkSpan with `const` elements viewing the data of this chunk.
+    //! @note The returned view does not own the data: it must not outlive this chunk.
     view_type span_cview() const
     {
         return view_type(*this);
     }
 
+    //! @brief Gives a read-only view on the data of this chunk.
+    //!
+    //! @return A ChunkSpan with `const` elements viewing the data of this chunk.
+    //! @note The returned view does not own the data: it must not outlive this chunk.
     view_type span_view() const
     {
         return view_type(*this);
     }
 
+    //! @brief Gives a view on the data of this chunk.
+    //!
+    //! @return A ChunkSpan viewing the data of this chunk.
+    //! @note The returned view does not own the data: it must not outlive this chunk.
     span_type span_view()
     {
         return span_type(*this);
     }
 };
 
+//! @brief Deduces the Chunk type from a label, a support and an allocator.
+//!
+//! @details The element type is the `value_type` of the allocator.
+//! @ingroup ddc_containers
 template <class SupportType, class Allocator>
 Chunk(std::string const&, SupportType const&, Allocator)
         -> Chunk<typename Allocator::value_type, SupportType, Allocator>;
 
+//! @brief Deduces the Chunk type from a support and an allocator.
+//!
+//! @details The element type is the `value_type` of the allocator.
+//! @ingroup ddc_containers
 template <class SupportType, class Allocator>
 Chunk(SupportType const&, Allocator)
         -> Chunk<typename Allocator::value_type, SupportType, Allocator>;
