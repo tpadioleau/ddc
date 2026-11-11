@@ -37,6 +37,7 @@ public:
         using other = AlignedAllocator<U, N>;
     };
 
+    //! @brief Default constructor.
     constexpr AlignedAllocator() = default;
 
     //! @brief Copy constructor.
@@ -59,6 +60,7 @@ public:
     {
     }
 
+    //! @brief Destructor.
     ~AlignedAllocator() = default;
 
     //! @brief Copy assignment operator.

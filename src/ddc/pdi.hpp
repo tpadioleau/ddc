@@ -78,15 +78,25 @@ public:
     //! @param[in] event_name Name of the PDI event triggered when this object is destroyed.
     explicit PdiEvent(std::string const& event_name);
 
+    //! @brief Deleted copy constructor: an event cannot be copied.
+    //! @param[in] rhs The event that cannot be copied.
     PdiEvent(PdiEvent const& rhs) = delete;
 
+    //! @brief Deleted move constructor: an event cannot be moved.
+    //! @param[in] rhs The event that cannot be moved.
     PdiEvent(PdiEvent&& rhs) noexcept = delete;
 
     //! Triggers the PDI event and reclaims every name shared through `with`.
     ~PdiEvent() noexcept;
 
+    //! @brief Deleted copy assignment operator: an event cannot be copied.
+    //! @param[in] rhs The event that cannot be copied.
+    //! @return No value, the operator is deleted.
     PdiEvent& operator=(PdiEvent const& rhs) = delete;
 
+    //! @brief Deleted move assignment operator: an event cannot be moved.
+    //! @param[in] rhs The event that cannot be moved.
+    //! @return No value, the operator is deleted.
     PdiEvent& operator=(PdiEvent&& rhs) noexcept = delete;
 
     /// @{

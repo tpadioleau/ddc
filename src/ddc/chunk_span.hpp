@@ -334,6 +334,7 @@ public:
     {
     }
 
+    //! @brief Destructor, does not release any memory since the view is non-owning.
     KOKKOS_DEFAULTED_FUNCTION ~ChunkSpan() noexcept = default;
 
     /** Copy-assigns a new value to this ChunkSpan, yields a new view to the same data

@@ -50,6 +50,7 @@ public:
         using other = KokkosAllocator<U, MemorySpace>;
     };
 
+    //! @brief Default constructor.
     constexpr KokkosAllocator() = default;
 
     //! @brief Copy constructor.
@@ -72,6 +73,7 @@ public:
     {
     }
 
+    //! @brief Destructor.
     ~KokkosAllocator() = default;
 
     //! @brief Copy assignment operator.
