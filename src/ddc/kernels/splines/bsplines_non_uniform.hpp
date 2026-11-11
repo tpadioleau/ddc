@@ -2,6 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides the non-uniform B-splines discrete dimension and the associated traits and
+//! concept.
+
 #pragma once
 
 #include <array>
@@ -28,6 +32,12 @@ struct NonUniformBSplinesBase
 
 } // namespace detail
 
+//! @brief Discrete dimension (non-uniform point sampling) of the knots of the non-uniform
+//! B-splines `T`.
+//!
+//! @tparam T The non-uniform B-splines discrete dimension whose knots are described.
+//!
+//! @ingroup ddc_splines
 template <class T>
 struct NonUniformBsplinesKnots : NonUniformPointSampling<typename T::continuous_dimension_type>
 {
@@ -41,6 +51,9 @@ struct NonUniformBsplinesKnots : NonUniformPointSampling<typename T::continuous_
  *
  * @tparam CDim The tag identifying the continuous dimension on which the support of the B-spline functions are defined.
  * @tparam D The degree of the B-splines.
+ * @tparam Periodic Whether the B-splines are periodic.
+ *
+ * @ingroup ddc_splines
  */
 template <class CDim, std::size_t D, bool Periodic>
 class NonUniformBSplines
@@ -117,6 +130,7 @@ public:
         ddc::DiscreteElement<DDim> m_reference;
 
     public:
+        //! @brief Default constructor.
         Impl() = default;
 
         /** @brief Constructs an Impl using a brace-list, i.e. `Impl bsplines({0., 1.})`
@@ -160,6 +174,8 @@ public:
          *
          * @param breaks_begin The iterator which points at the beginning of the break points.
          * @param breaks_end The iterator which points at the end of the break points.
+         *
+         * @pre The first break point is strictly lower than the last one (checked by an `assert`).
          */
         template <class RandomIt>
         Impl(RandomIt breaks_begin, RandomIt breaks_end);
@@ -396,6 +412,12 @@ public:
     };
 };
 
+//! @brief Trait deriving from `std::true_type` if `T` is a non-uniform B-splines discrete
+//! dimension.
+//!
+//! @tparam T The type to inspect.
+//!
+//! @ingroup ddc_splines
 template <class T>
 struct is_non_uniform_bsplines : public std::is_base_of<detail::NonUniformBSplinesBase, T>::type
 {
@@ -404,13 +426,20 @@ struct is_non_uniform_bsplines : public std::is_base_of<detail::NonUniformBSplin
 /**
  * @brief Indicates if a tag corresponds to non-uniform B-splines or not.
  *
- * @tparam The presumed non-uniform B-splines.
+ * @tparam T The presumed non-uniform B-splines.
+ *
+ * @ingroup ddc_splines
  */
 template <class T>
 constexpr bool is_non_uniform_bsplines_v = is_non_uniform_bsplines<T>::value;
 
 namespace concepts {
 
+//! @brief Concept satisfied by discrete dimensions that are non-uniform B-splines.
+//!
+//! @tparam T The type to test.
+//!
+//! @ingroup ddc_splines
 template <class T>
 concept non_uniform_bsplines = discrete_dimension<T> && is_non_uniform_bsplines_v<T>;
 

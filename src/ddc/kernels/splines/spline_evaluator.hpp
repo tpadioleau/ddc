@@ -2,6 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides the one-dimensional SplineEvaluator evaluating, differentiating and integrating
+//! a spline function.
+
 #pragma once
 
 #include <array>
@@ -29,6 +33,8 @@ namespace ddc {
  * @tparam EvaluationDDim The discrete dimension on which evaluation points are defined.
  * @tparam LowerExtrapolationRule The lower extrapolation rule type.
  * @tparam UpperExtrapolationRule The upper extrapolation rule type.
+ *
+ * @ingroup ddc_splines
  */
 template <
         class ExecSpace,
@@ -61,7 +67,8 @@ public:
     /**
      * @brief The type of the whole domain representing evaluation points.
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      */
     template <concepts::discrete_domain BatchedInterpolationDDom>
     using batched_evaluation_domain_type = BatchedInterpolationDDom;
@@ -73,7 +80,8 @@ public:
      * @brief The type of the batch domain (obtained by removing the dimension of interest
      * from the whole domain).
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      */
     template <concepts::discrete_domain BatchedInterpolationDDom>
     using batch_domain_type
@@ -83,7 +91,8 @@ public:
      * @brief The type of the whole spline domain (cartesian product of 1D spline domain
      * and batch domain) preserving the order of dimensions.
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      */
     template <concepts::discrete_domain BatchedInterpolationDDom>
     using batched_spline_domain_type = ddc::replace_dim_of_t<

@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides type traits identifying spline builders and evaluators and their compatibility.
+
 #pragma once
 
 #include <type_traits>
@@ -19,6 +22,12 @@
 
 namespace ddc {
 
+//! @brief Trait deriving from `std::true_type` if `T` is a SplineBuilder, `std::false_type`
+//! otherwise.
+//!
+//! @tparam T The type to inspect.
+//!
+//! @ingroup ddc_splines
 template <class T>
 struct is_spline_builder : std::false_type
 {
@@ -46,10 +55,18 @@ struct is_spline_builder<SplineBuilder<
 /**
  *  @brief A helper to check if T is a SplineBuilder
  *  @tparam T The type to be checked if is a SplineBuilder
+ *
+ *  @ingroup ddc_splines
  */
 template <class T>
 inline constexpr bool is_spline_builder_v = is_spline_builder<T>::value;
 
+//! @brief Trait deriving from `std::true_type` if `T` is a SplineBuilder2D, `std::false_type`
+//! otherwise.
+//!
+//! @tparam T The type to inspect.
+//!
+//! @ingroup ddc_splines
 template <class T>
 struct is_spline_builder2d : std::false_type
 {
@@ -85,10 +102,18 @@ struct is_spline_builder2d<SplineBuilder2D<
 /**
  *  @brief A helper to check if T is a SplineBuilder2D
  *  @tparam T The type to be checked if is a SplineBuilder2D
+ *
+ *  @ingroup ddc_splines
  */
 template <class T>
 inline constexpr bool is_spline_builder2d_v = is_spline_builder2d<T>::value;
 
+//! @brief Trait deriving from `std::true_type` if `T` is a SplineBuilder3D, `std::false_type`
+//! otherwise.
+//!
+//! @tparam T The type to inspect.
+//!
+//! @ingroup ddc_splines
 template <class T>
 struct is_spline_builder3d : std::false_type
 {
@@ -132,10 +157,18 @@ struct is_spline_builder3d<SplineBuilder3D<
 /**
  *  @brief A helper to check if T is a SplineBuilder3D
  *  @tparam T The type to be checked if is a SplineBuilder3D
+ *
+ *  @ingroup ddc_splines
  */
 template <class T>
 inline constexpr bool is_spline_builder3d_v = is_spline_builder3d<T>::value;
 
+//! @brief Trait deriving from `std::true_type` if `T` is a SplineEvaluator (or a one-dimensional
+//! SplineEvaluatorND), `std::false_type` otherwise.
+//!
+//! @tparam T The type to inspect.
+//!
+//! @ingroup ddc_splines
 template <class T>
 struct is_spline_evaluator : std::false_type
 {
@@ -177,10 +210,18 @@ struct is_spline_evaluator<SplineEvaluatorND<
 /**
  *  @brief A helper to check if T is a SplineEvaluator
  *  @tparam T The type to be checked if is a SplineEvaluator
+ *
+ *  @ingroup ddc_splines
  */
 template <class T>
 inline constexpr bool is_spline_evaluator_v = is_spline_evaluator<T>::value;
 
+//! @brief Trait deriving from `std::true_type` if `T` is a SplineEvaluator2D (or a two-dimensional
+//! SplineEvaluatorND), `std::false_type` otherwise.
+//!
+//! @tparam T The type to inspect.
+//!
+//! @ingroup ddc_splines
 template <class T>
 struct is_spline_evaluator2d : std::false_type
 {
@@ -238,10 +279,18 @@ struct is_spline_evaluator2d<SplineEvaluatorND<
 /**
  *  @brief A helper to check if T is a SplineEvaluator2D
  *  @tparam T The type to be checked if is a SplineEvaluator2D
+ *
+ *  @ingroup ddc_splines
  */
 template <class T>
 inline constexpr bool is_spline_evaluator2d_v = is_spline_evaluator2d<T>::value;
 
+//! @brief Trait deriving from `std::true_type` if `T` is a SplineEvaluator3D (or a
+//! three-dimensional SplineEvaluatorND), `std::false_type` otherwise.
+//!
+//! @tparam T The type to inspect.
+//!
+//! @ingroup ddc_splines
 template <class T>
 struct is_spline_evaluator3d : std::false_type
 {
@@ -313,10 +362,18 @@ struct is_spline_evaluator3d<SplineEvaluatorND<
 /**
  *  @brief A helper to check if T is a SplineEvaluator3D
  *  @tparam T The type to be checked if is a SplineEvaluator3D
+ *
+ *  @ingroup ddc_splines
  */
 template <class T>
 inline constexpr bool is_spline_evaluator3d_v = is_spline_evaluator3d<T>::value;
 
+//! @brief Trait deriving from `std::true_type` if `T` is a SplineEvaluatorND, `std::false_type`
+//! otherwise.
+//!
+//! @tparam T The type to inspect.
+//!
+//! @ingroup ddc_splines
 template <class T>
 struct is_spline_evaluatornd : std::false_type
 {
@@ -337,10 +394,19 @@ struct is_spline_evaluatornd<
 /**
  *  @brief A helper to check if T is a SplineEvaluatorND
  *  @tparam T The type to be checked if is a SplineEvaluatorND
+ *
+ *  @ingroup ddc_splines
  */
 template <class T>
 inline constexpr bool is_spline_evaluatornd_v = is_spline_evaluatornd<T>::value;
 
+//! @brief Trait deriving from `std::true_type` if `Evaluator` can evaluate the splines built by
+//! `Builder`, `std::false_type` otherwise.
+//!
+//! @tparam Builder The spline builder type.
+//! @tparam Evaluator The spline evaluator type.
+//!
+//! @ingroup ddc_splines
 template <class Builder, class Evaluator>
 struct is_evaluator_admissible : std::false_type
 {
@@ -587,6 +653,8 @@ struct is_evaluator_admissible<
  *  @brief A helper to check if SplineEvaluator is admissible for SplineBuilder
  *  @tparam Builder The builder type to be checked if it is admissible for Evaluator
  *  @tparam Evaluator The evaluator type to be checked if it is admissible for Builder
+ *
+ *  @ingroup ddc_splines
  */
 template <class Builder, class Evaluator>
 inline constexpr bool is_evaluator_admissible_v

@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides the enumeration of spline closure relations and related helpers.
+
 #pragma once
 
 #include <cstddef>
@@ -12,6 +15,8 @@ namespace ddc {
 
 /** @brief An enum representing a spline closure relation. Please refer to
  * Emily Bourne's thesis (https://theses.fr/2022AIXM0412.pdf)
+ *
+ * @ingroup ddc_splines
  */
 enum class SplineBuilderClosure {
     PERIODIC, ///< Periodic closure relation u(1)=u(n)
@@ -27,6 +32,8 @@ enum class SplineBuilderClosure {
  * @param sbc The closure relation.
  *
  * @return The stream in which the closure relation is printed.
+ *
+ * @ingroup ddc_splines
  **/
 std::ostream& operator<<(std::ostream& os, ddc::SplineBuilderClosure sbc);
 
@@ -37,6 +44,10 @@ std::ostream& operator<<(std::ostream& os, ddc::SplineBuilderClosure sbc);
  * @param degree The degree of the spline.
  *
  * @return The number of equations.
+ *
+ * @throws std::runtime_error If the closure relation is not one of the handled values.
+ *
+ * @ingroup ddc_splines
  **/
 constexpr int n_boundary_equations(ddc::SplineBuilderClosure const sbc, std::size_t const degree)
 {

@@ -2,6 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides an extrapolation rule using the value at a fixed coordinate outside of the
+//! domain.
+
 #pragma once
 
 #include <array>
@@ -19,6 +23,10 @@ namespace ddc {
  *
  * To define the value of a function on B-splines out of the domain, we here use a constant
  * extrapolation on the edge.
+ *
+ * @tparam DimI The continuous dimension along which the extrapolation is defined.
+ *
+ * @ingroup ddc_splines
  */
 template <class DimI>
 struct ConstantExtrapolationRule

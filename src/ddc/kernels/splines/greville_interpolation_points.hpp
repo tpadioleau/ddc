@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides a helper computing Greville interpolation points from a B-splines definition.
+
 #pragma once
 
 #include <cassert>
@@ -25,6 +28,8 @@ namespace ddc {
  * @tparam BSplines The bspline class relative to which the Greville points will be calculated.
  * @tparam SBCLower The lower closure relation that will be used to build the splines.
  * @tparam SBCUpper The upper closure relation that will be used to build the splines.
+ *
+ * @ingroup ddc_splines
  */
 template <class BSplines, ddc::SplineBuilderClosure SBCLower, ddc::SplineBuilderClosure SBCUpper>
 class GrevilleInterpolationPoints

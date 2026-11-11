@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides a helper placing the spline interpolation points at the knots of the B-splines.
+
 #pragma once
 
 #include <tuple>
@@ -32,6 +35,8 @@ namespace ddc {
  * @tparam BSplines The type of the uniform or non-uniform spline basis whose knots are used as interpolation points.
  * @tparam SBCLower The lower closure relation.
  * @tparam SBCLower The upper closure relation.
+ *
+ * @ingroup ddc_splines
  */
 template <class BSplines, ddc::SplineBuilderClosure SBCLower, ddc::SplineBuilderClosure SBCUpper>
 class KnotsAsInterpolationPoints
@@ -44,6 +49,9 @@ class KnotsAsInterpolationPoints
 public:
     /**
      * Get the sampling of interpolation points.
+     *
+     * @tparam Sampling The type of the sampling of the interpolation points, either uniform or
+     * non-uniform.
      *
      * @return sampling The DDC point sampling of the interpolation points.
      */
@@ -78,6 +86,8 @@ public:
 
     /**
      * Get the domain which can be used to access the interpolation points in the sampling.
+     *
+     * @tparam Sampling The type of the sampling of the interpolation points.
      *
      * @return domain The discrete domain which maps to the sampling of interpolation points.
      */

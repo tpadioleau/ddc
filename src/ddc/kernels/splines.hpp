@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Umbrella header including every public header of the DDC splines component.
+
 #pragma once
 
 #include "splines/bsplines.hpp"

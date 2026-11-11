@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides the 2D SplineBuilder, building a spline approximation over 2 dimensions.
+
 #pragma once
 
 #include <cassert>
@@ -23,6 +26,22 @@ namespace ddc {
  * of a function. A 2D spline approximation uses a cross-product between two 1D SplineBuilder.
  *
  * @see SplineBuilder
+ *
+ * @tparam ExecSpace The Kokkos execution space on which the spline approximation is performed.
+ * @tparam MemorySpace The Kokkos memory space on which the data is stored.
+ * @tparam BSpline1 The discrete dimension representing the B-splines along dimension 1.
+ * @tparam BSpline2 The discrete dimension representing the B-splines along dimension 2.
+ * @tparam DDimI1 The discrete dimension on which the interpolation points are defined along
+ * dimension 1.
+ * @tparam DDimI2 The discrete dimension on which the interpolation points are defined along
+ * dimension 2.
+ * @tparam SBCLower1 The lower closure relation along dimension 1.
+ * @tparam SBCUpper1 The upper closure relation along dimension 1.
+ * @tparam SBCLower2 The lower closure relation along dimension 2.
+ * @tparam SBCUpper2 The upper closure relation along dimension 2.
+ * @tparam Solver The SplineSolver giving the backend used to perform the spline approximation.
+ *
+ * @ingroup ddc_splines
  */
 template <
         class ExecSpace,
@@ -93,7 +112,8 @@ public:
     /**
      * @brief The type of the whole domain representing interpolation points.
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      */
     template <concepts::discrete_domain BatchedInterpolationDDom>
     using batched_interpolation_domain_type = BatchedInterpolationDDom;
@@ -102,7 +122,8 @@ public:
      * @brief The type of the batch domain (obtained by removing the dimensions of interest
      * from the whole domain).
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      *
      * Example: For batched_interpolation_domain_type = DiscreteDomain<X,Y,Z> and dimensions of interest X and Y,
      * this is DiscreteDomain<Z>.
@@ -117,7 +138,8 @@ public:
      * @brief The type of the whole spline domain (cartesian product of 2D spline domain
      * and batch domain) preserving the order of dimensions.
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      *
      * Example: For batched_interpolation_domain_type = DiscreteDomain<X,Y,Z> and dimensions of interest X and Y
      * (associated to B-splines tags BSplinesX and BSplinesY), this is DiscreteDomain<BSplinesX, BSplinesY, Z>
@@ -135,7 +157,8 @@ public:
      * @brief The type of the whole Derivs domain (cartesian product of the 1D Deriv domain
      * and the associated batch domain) in the first dimension, preserving the order of dimensions.
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      *
      * Example: For batched_interpolation_domain_type = DiscreteDomain<X,Y,Z> and dimensions of interest X and Y,
      * this is DiscreteDomain<Deriv<X>, Y, Z>.
@@ -148,7 +171,8 @@ public:
      * @brief The type of the whole Derivs domain (cartesian product of the 1D Deriv domain
      * and the associated batch domain) in the second dimension, preserving the order of dimensions.
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      *
      * Example: For batched_interpolation_domain_type = DiscreteDomain<X,Y,Z> and dimensions of interest X and Y,
      * this is DiscreteDomain<X, Deriv<Y>, Z>.
@@ -163,7 +187,8 @@ public:
      * @brief The type of the whole Derivs domain (cartesian product of the 2D Deriv domain
      * and the batch domain) in the second dimension, preserving the order of dimensions.
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      *
      * Example: For batched_interpolation_domain_type = DiscreteDomain<X,Y,Z> and dimensions of interest X and Y,
      * this is DiscreteDomain<Deriv<X>, Deriv<Y>, Z>.
@@ -200,6 +225,9 @@ public:
      * This value is optional. If no value is provided then the default value is chosen by the requested solver.
      *
      * @see SplinesLinearProblemSparse
+     *
+     * @throws std::runtime_error Under the same conditions as the constructors of the
+     * one-dimensional SplineBuilder used along each dimension.
      */
     explicit SplineBuilder2D(
             std::string const& label,
@@ -235,6 +263,9 @@ public:
      * This value is optional. If no value is provided then the default value is chosen by the requested solver.
      *
      * @see SplinesLinearProblemSparse
+     *
+     * @throws std::runtime_error Under the same conditions as the constructors of the
+     * one-dimensional SplineBuilder used along each dimension.
      */
     explicit SplineBuilder2D(
             interpolation_domain_type const& interpolation_domain,
@@ -265,6 +296,9 @@ public:
      * This value is optional. If no value is provided then the default value is chosen by the requested solver.
      *
      * @see SplinesLinearProblemSparse
+     *
+     * @throws std::runtime_error Under the same conditions as the constructors of the
+     * one-dimensional SplineBuilder used along each dimension.
      */
     template <concepts::discrete_domain BatchedInterpolationDDom>
     explicit SplineBuilder2D(
@@ -295,6 +329,9 @@ public:
      * This value is optional. If no value is provided then the default value is chosen by the requested solver.
      *
      * @see SplinesLinearProblemSparse
+     *
+     * @throws std::runtime_error Under the same conditions as the constructors of the
+     * one-dimensional SplineBuilder used along each dimension.
      */
     template <concepts::discrete_domain BatchedInterpolationDDom>
     explicit SplineBuilder2D(

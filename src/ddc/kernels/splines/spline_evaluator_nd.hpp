@@ -2,6 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides the N-dimensional SplineEvaluatorND evaluating, differentiating and integrating
+//! a spline function.
+
 #pragma once
 
 #include <array>
@@ -29,6 +33,8 @@ namespace ddc {
  * - BSplines A TypeSeq containing the N discrete dimensions representing the B-splines along the dimensions of interest.
  * - EvaluationDDim A TypeSeq containing the discrete dimensions on which evaluation points are defined.
  * - ExtrapolationRule A TypeSeq containing the lower and upper extrapolation rules along each dimension of interest.
+ *
+ * @ingroup ddc_splines
  */
 template <
         class ExecSpace,
@@ -38,6 +44,10 @@ template <
         class ExtrapolationRule>
 class SplineEvaluatorND;
 
+//! @brief Specialization of SplineEvaluatorND where the dimensions of interest are given as
+//! TypeSeq of B-splines, evaluation discrete dimensions and extrapolation rules.
+//!
+//! @ingroup ddc_splines
 template <
         class ExecSpace,
         class MemorySpace,
@@ -97,7 +107,8 @@ public:
     /**
      * @brief The type of the whole domain representing evaluation points.
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      */
     template <concepts::discrete_domain BatchedInterpolationDDom>
     using batched_evaluation_domain_type = BatchedInterpolationDDom;
@@ -114,7 +125,8 @@ public:
      * @brief The type of the batch domain (obtained by removing the dimensions of interest
      * from the whole domain).
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      */
     template <concepts::discrete_domain BatchedInterpolationDDom>
     using batch_domain_type
@@ -126,7 +138,8 @@ public:
      * @brief The type of the whole spline domain (cartesian product of ND spline domain
      * and batch domain) preserving the underlying memory layout (order of dimensions).
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      */
     template <concepts::discrete_domain BatchedInterpolationDDom>
     using batched_spline_domain_type
@@ -266,6 +279,8 @@ public:
      * @return The lower extrapolation rule along the Ith dimension.
      *
      * @see NullExtrapolationRule ConstantExtrapolationRule PeriodicExtrapolationRule
+     *
+     * @tparam I The index of the dimension of interest (0-indexed).
      */
     template <std::size_t I>
     auto lower_extrapolation_rule() const
@@ -281,6 +296,8 @@ public:
      * @return The upper extrapolation rule along the Ith dimension.
      *
      * @see NullExtrapolationRule ConstantExtrapolationRule PeriodicExtrapolationRule
+     *
+     * @tparam I The index of the dimension of interest (0-indexed).
      */
     template <std::size_t I>
     auto upper_extrapolation_rule() const

@@ -2,6 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides the three-dimensional SplineEvaluator3D evaluating, differentiating and
+//! integrating a spline function.
+
 #pragma once
 
 #include <array>
@@ -37,6 +41,8 @@ namespace ddc {
  * @tparam UpperExtrapolationRule2 The upper extrapolation rule type along second dimension of interest.
  * @tparam LowerExtrapolationRule3 The lower extrapolation rule type along third dimension of interest.
  * @tparam UpperExtrapolationRule3 The upper extrapolation rule type along third dimension of interest.
+ *
+ * @ingroup ddc_splines
  */
 template <
         class ExecSpace,
@@ -107,7 +113,8 @@ public:
     /**
      * @brief The type of the whole domain representing evaluation points.
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      */
     template <concepts::discrete_domain BatchedInterpolationDDom>
     using batched_evaluation_domain_type = BatchedInterpolationDDom;
@@ -128,7 +135,8 @@ public:
      * @brief The type of the batch domain (obtained by removing the dimensions of interest
      * from the whole domain).
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      */
     template <concepts::discrete_domain BatchedInterpolationDDom>
     using batch_domain_type = ddc::remove_dims_of_t<
@@ -141,7 +149,8 @@ public:
      * @brief The type of the whole spline domain (cartesian product of 3D spline domain
      * and batch domain) preserving the underlying memory layout (order of dimensions).
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      */
     template <concepts::discrete_domain BatchedInterpolationDDom>
     using batched_spline_domain_type

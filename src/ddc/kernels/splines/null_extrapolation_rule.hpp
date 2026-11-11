@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides an extrapolation rule returning zero outside of the spline domain.
+
 #pragma once
 
 #include <ddc/ddc.hpp>
@@ -12,6 +15,8 @@ namespace ddc {
 
 /**
  * @brief A functor describing a null extrapolation boundary value for 1D spline evaluator.
+ *
+ * @ingroup ddc_splines
  */
 struct NullExtrapolationRule
 {

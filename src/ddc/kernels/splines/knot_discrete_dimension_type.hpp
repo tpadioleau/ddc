@@ -2,6 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides a trait mapping a B-splines discrete dimension to the discrete dimension of its
+//! knots.
+
 #pragma once
 
 #include <type_traits>
@@ -13,6 +17,10 @@
 namespace ddc {
 
 /// If the type `DDim` is a B-spline, defines `type` to the discrete dimension of the associated knots.
+///
+/// @tparam DDim The uniform or non-uniform B-splines discrete dimension.
+///
+/// @ingroup ddc_splines
 template <concepts::bsplines DDim>
 struct KnotDiscreteDimension
 {
@@ -24,6 +32,10 @@ struct KnotDiscreteDimension
 };
 
 /// Helper type to easily access `KnotDiscreteDimension<DDim>::type`
+///
+/// @tparam DDim The uniform or non-uniform B-splines discrete dimension.
+///
+/// @ingroup ddc_splines
 template <concepts::bsplines DDim>
 using knot_discrete_dimension_t = KnotDiscreteDimension<DDim>::type;
 

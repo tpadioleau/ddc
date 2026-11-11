@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides the function computing the integrals of the basis functions of B-splines.
+
 #pragma once
 
 #include <array>
@@ -161,7 +164,13 @@ void non_uniform_bsplines_integrals(
  *
  * @param[in] execution_space a Kokkos execution space where the loop will be executed on
  * @param[out] int_vals The values of the integrals. It has to be a 1D Chunkspan of size (nbasis).
- * @return The values of the integrals.
+ * @return The values of the integrals, i.e. `int_vals`.
+ *
+ * @pre `int_vals` has `nbasis` elements or, for periodic B-splines, `nbasis` or the full
+ * size of the discrete space (the repeated trailing elements are then set to 0). This is
+ * checked by an `assert`.
+ *
+ * @ingroup ddc_splines
  */
 template <class ExecSpace, concepts::bsplines DDim, class Layout, class MemorySpace>
 ddc::ChunkSpan<Real, ddc::DiscreteDomain<DDim>, Layout, MemorySpace> integrals(

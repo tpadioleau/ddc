@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides the uniform B-splines discrete dimension and the associated traits and concept.
+
 #pragma once
 
 #include <array>
@@ -32,6 +35,11 @@ void uniform_bsplines_integrals(
 
 } // namespace detail
 
+//! @brief Discrete dimension (uniform point sampling) of the knots of the uniform B-splines `T`.
+//!
+//! @tparam T The uniform B-splines discrete dimension whose knots are described.
+//!
+//! @ingroup ddc_splines
 template <class T>
 struct UniformBsplinesKnots : UniformPointSampling<typename T::continuous_dimension_type>
 {
@@ -45,6 +53,9 @@ struct UniformBsplinesKnots : UniformPointSampling<typename T::continuous_dimens
  *
  * @tparam CDim The tag identifying the continuous dimension on which the support of the B-spline functions are defined.
  * @tparam D The degree of the B-splines.
+ * @tparam Periodic Whether the B-splines are periodic.
+ *
+ * @ingroup ddc_splines
  */
 template <class CDim, std::size_t D, bool Periodic>
 class UniformBSplines
@@ -127,6 +138,7 @@ public:
         ddc::DiscreteElement<DDim> m_reference;
 
     public:
+        //! @brief Default constructor.
         Impl() = default;
 
         /** Constructs a spline basis (B-splines) with n equidistant knots over \f$[a, b]\f$.
@@ -376,6 +388,11 @@ public:
     };
 };
 
+//! @brief Trait deriving from `std::true_type` if `T` is a uniform B-splines discrete dimension.
+//!
+//! @tparam T The type to inspect.
+//!
+//! @ingroup ddc_splines
 template <class T>
 struct is_uniform_bsplines : public std::is_base_of<detail::UniformBSplinesBase, T>::type
 {
@@ -384,13 +401,20 @@ struct is_uniform_bsplines : public std::is_base_of<detail::UniformBSplinesBase,
 /**
  * @brief Indicates if a tag corresponds to uniform B-splines or not.
  *
- * @tparam The presumed uniform B-splines.
+ * @tparam T The presumed uniform B-splines.
+ *
+ * @ingroup ddc_splines
  */
 template <class T>
 constexpr bool is_uniform_bsplines_v = is_uniform_bsplines<T>::value;
 
 namespace concepts {
 
+//! @brief Concept satisfied by discrete dimensions that are uniform B-splines.
+//!
+//! @tparam T The type to test.
+//!
+//! @ingroup ddc_splines
 template <class T>
 concept uniform_bsplines = discrete_dimension<T> && is_uniform_bsplines_v<T>;
 

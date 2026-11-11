@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides the one-dimensional SplineBuilder and the SplineSolver enumeration.
+
 #pragma once
 
 #include <array>
@@ -31,6 +34,8 @@ namespace ddc {
  * @brief An enum determining the backend solver of a SplineBuilder or SplineBuilder2d.
  *
  * An enum determining the backend solver of a SplineBuilder or SplineBuilder2d.
+ *
+ * @ingroup ddc_splines
  */
 enum class SplineSolver {
     GINKGO, ///< Enum member to identify the Ginkgo-based solver (iterative method)
@@ -52,6 +57,8 @@ enum class SplineSolver {
  * @tparam SBCLower The lower closure relation.
  * @tparam SBCUpper The upper closure relation.
  * @tparam Solver The SplineSolver giving the backend used to perform the spline approximation.
+ *
+ * @ingroup ddc_splines
  */
 template <
         class ExecSpace,
@@ -94,7 +101,8 @@ public:
     /**
      * @brief The type of the whole domain representing interpolation points.
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      */
     template <concepts::discrete_domain BatchedInterpolationDDom>
     using batched_interpolation_domain_type = BatchedInterpolationDDom;
@@ -103,7 +111,8 @@ public:
      * @brief The type of the batch domain (obtained by removing the dimension of interest
      * from the whole domain).
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      *
      * Example: For batched_interpolation_domain_type = DiscreteDomain<X,Y,Z> and a dimension of interest Y,
      * this is DiscreteDomain<X,Z>
@@ -116,7 +125,8 @@ public:
      * @brief The type of the whole spline domain (cartesian product of 1D spline domain
      * and batch domain) preserving the underlying memory layout (order of dimensions).
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      *
      * Example: For batched_interpolation_domain_type = DiscreteDomain<X,Y,Z> and a dimension of interest Y
      * (associated to a B-splines tag BSplinesY), this is DiscreteDomain<X,BSplinesY,Z>.
@@ -132,7 +142,8 @@ private:
      * @brief The type of the whole spline domain (cartesian product of the 1D spline domain
      * and the batch domain) with 1D spline dimension being the leading dimension.
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      *
      * Example: For batched_interpolation_domain_type = DiscreteDomain<X,Y,Z> and a dimension of interest Y
      * (associated to a B-splines tag BSplinesY), this is DiscreteDomain<BSplinesY,X,Z>.
@@ -150,7 +161,8 @@ public:
      * @brief The type of the whole Deriv domain (cartesian product of 1D Deriv domain
      * and batch domain) preserving the underlying memory layout (order of dimensions).
      *
-     * @tparam The batched discrete domain on which the interpolation points are defined.
+     * @tparam BatchedInterpolationDDom The batched discrete domain on which the interpolation
+     * points are defined.
      *
      * Example: For batched_interpolation_domain_type = DiscreteDomain<X,Y,Z> and a dimension of interest Y,
      * this is DiscreteDomain<X,Deriv<Y>,Z>
@@ -222,6 +234,10 @@ public:
      * This value is optional. If no value is provided then the default value is chosen by the requested solver.
      *
      * @see MatrixSparse
+     *
+     * @throws std::runtime_error If the number of interpolation points does not match the number
+     * of B-splines minus the number of boundary equations, or if a cell of the B-splines contains
+     * more than `degree + 1` interpolation points (over-constrained problem).
      */
     explicit SplineBuilder(
             std::string label,
@@ -273,6 +289,10 @@ public:
      * This value is optional. If no value is provided then the default value is chosen by the requested solver.
      *
      * @see MatrixSparse
+     *
+     * @throws std::runtime_error If the number of interpolation points does not match the number
+     * of B-splines minus the number of boundary equations, or if a cell of the B-splines contains
+     * more than `degree + 1` interpolation points (over-constrained problem).
      */
     explicit SplineBuilder(
             interpolation_domain_type const& interpolation_domain,
@@ -303,6 +323,10 @@ public:
      * This value is optional. If no value is provided then the default value is chosen by the requested solver.
      *
      * @see MatrixSparse
+     *
+     * @throws std::runtime_error If the number of interpolation points does not match the number
+     * of B-splines minus the number of boundary equations, or if a cell of the B-splines contains
+     * more than `degree + 1` interpolation points (over-constrained problem).
      */
     template <concepts::discrete_domain BatchedInterpolationDDom>
     explicit SplineBuilder(
@@ -333,6 +357,10 @@ public:
      * This value is optional. If no value is provided then the default value is chosen by the requested solver.
      *
      * @see MatrixSparse
+     *
+     * @throws std::runtime_error If the number of interpolation points does not match the number
+     * of B-splines minus the number of boundary equations, or if a cell of the B-splines contains
+     * more than `degree + 1` interpolation points (over-constrained problem).
      */
     template <concepts::discrete_domain BatchedInterpolationDDom>
     explicit SplineBuilder(
@@ -533,6 +561,16 @@ public:
      * (used only with SplineBuilderClosure::HERMITE lower closure relation).
      * @param[in] derivs_xmax The values of the derivatives at the upper boundary
      * (used only with SplineBuilderClosure::HERMITE upper closure relation).
+     *
+     * @pre The interpolation domain of `vals` is the one of this builder, the batch domains of
+     * `spline` and `vals` are identical, and `vals` has `nbasis - nbe_lower - nbe_upper` points
+     * along the dimension of interest (checked by `assert`).
+     * @pre For a HERMITE closure relation, `derivs_xmin` (resp. `derivs_xmax`) has a Deriv
+     * domain starting at index 1 for odd degrees and 0 for even degrees, and containing one
+     * element per boundary equation. For any other closure relation it is either not provided or
+     * has an empty Deriv domain (checked by `assert`).
+     *
+     * @note If the batch domain is empty, the function returns without doing anything.
      */
     template <class Layout, class BatchedInterpolationDDom>
     void operator()(

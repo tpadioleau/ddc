@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Provides the placeholder extrapolation rule used to request periodic boundaries.
+
 #pragma once
 
 #include <ddc/ddc.hpp>
@@ -16,6 +19,10 @@ namespace ddc {
  *
  * This rule is handled by the spline evaluator itself and therefore this
  * functor should never be invoked.
+ *
+ * @tparam DimI The continuous dimension along which the evaluation is periodic.
+ *
+ * @ingroup ddc_splines
  */
 template <class DimI>
 struct PeriodicExtrapolationRule
