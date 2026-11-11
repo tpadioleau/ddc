@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Parallel iteration over a domain using one Kokkos team per element.
+
 #pragma once
 
 #include <array>
@@ -23,6 +26,8 @@ namespace ddc {
  * `Kokkos::ThreadVectorRange`, `Kokkos::single`, `team.team_barrier()`, scratch memory, ...).
  *
  * @tparam ExecSpace a Kokkos execution space
+ *
+ * @ingroup ddc_algorithms
  */
 template <class ExecSpace>
 using TeamPolicyMember
@@ -107,6 +112,11 @@ void for_each_team_kokkos(
  * @param[in] execution_space a Kokkos execution space where the loop will be executed on
  * @param[in] domain the domain over which to iterate
  * @param[in] f      a functor taking as parameters a `ddc::TeamPolicyMember<ExecSpace>` and an index
+ *
+ * @warning The function is `noexcept` while it throws a `std::runtime_error` if the number of
+ * elements of the domain does not fit in an `int`, in which case `std::terminate` is called.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class ExecSpace, class Support, class Functor>
 void parallel_for_each_team(
@@ -135,6 +145,11 @@ void parallel_for_each_team(
  * @param[in] team_size the number of threads per team
  * @param[in] vector_length the vector length of each thread of the team
  * @param[in] f      a functor taking as parameters a `ddc::TeamPolicyMember<ExecSpace>` and an index
+ *
+ * @warning The function is `noexcept` while it throws a `std::runtime_error` if the number of
+ * elements of the domain does not fit in an `int`, in which case `std::terminate` is called.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class ExecSpace, class Support, class Functor>
 void parallel_for_each_team(
@@ -165,6 +180,11 @@ void parallel_for_each_team(
  * @param[in] execution_space a Kokkos execution space where the loop will be executed on
  * @param[in] domain the domain over which to iterate
  * @param[in] f      a functor taking as parameters a `ddc::TeamPolicyMember<ExecSpace>` and an index
+ *
+ * @warning The function is `noexcept` while it throws a `std::runtime_error` if the number of
+ * elements of the domain does not fit in an `int`, in which case `std::terminate` is called.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class ExecSpace, class Support, class Functor>
 void parallel_for_each_team(
@@ -193,6 +213,11 @@ void parallel_for_each_team(
  * @param[in] domain the domain over which to iterate
  * @param[in] f      a functor taking as parameters a `ddc::TeamPolicyMember<Kokkos::DefaultExecutionSpace>`
  *                   and an index
+ *
+ * @warning The function is `noexcept` while it throws a `std::runtime_error` if the number of
+ * elements of the domain does not fit in an `int`, in which case `std::terminate` is called.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class Support, class Functor>
 void parallel_for_each_team(std::string const& label, Support const& domain, Functor&& f) noexcept
@@ -215,6 +240,11 @@ void parallel_for_each_team(std::string const& label, Support const& domain, Fun
  * @param[in] domain the domain over which to iterate
  * @param[in] f      a functor taking as parameters a `ddc::TeamPolicyMember<Kokkos::DefaultExecutionSpace>`
  *                   and an index
+ *
+ * @warning The function is `noexcept` while it throws a `std::runtime_error` if the number of
+ * elements of the domain does not fit in an `int`, in which case `std::terminate` is called.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class Support, class Functor>
 void parallel_for_each_team(Support const& domain, Functor&& f) noexcept

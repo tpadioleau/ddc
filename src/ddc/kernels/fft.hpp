@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Fast Fourier transforms of chunks on uniform periodic meshes, built on KokkosFFT.
+
 #pragma once
 
 #include <cassert>
@@ -18,7 +21,9 @@ namespace ddc {
 /**
  * @brief A templated tag representing a continuous dimension in the Fourier space associated to the original continuous dimension.
  *
- * @tparam The tag representing the original dimension.
+ * @tparam Dim The tag representing the original dimension.
+ *
+ * @ingroup ddc_fft
  */
 template <typename Dim>
 struct Fourier
@@ -29,6 +34,8 @@ struct Fourier
  * @brief A named argument to choose the direction of the FFT.
  *
  * @see kwArgsImpl, kwArgs_fft
+ *
+ * @ingroup ddc_fft
  */
 enum class FFT_Direction {
     FORWARD, ///< Forward, corresponds to direct FFT up to normalization
@@ -39,6 +46,8 @@ enum class FFT_Direction {
  * @brief A named argument to choose the type of normalization of the FFT.
  *
  * @see kwArgsImpl, kwArgs_fft
+ *
+ * @ingroup ddc_fft
  */
 enum class FFT_Normalization {
     OFF, ///< No normalization. Un-normalized FFT is sum_j f(x_j)*e^-ikx_j
@@ -242,13 +251,14 @@ namespace ddc {
  * which is used in the implementation (xmax, xmin, kmin and kmax are the centers of lower and upper cells inside a single period of the meshes).
  *
  * @tparam DDimFx A PeriodicSampling representing the Fourier discrete dimension.
- * @tparam DDimX The type of the original discrete dimension.
  *
  * @param x_mesh The DiscreteDomain representing the (1D) original mesh.
  *
  * @return The initialized Impl representing the discrete Fourier space.
  *
  * @see PeriodicSampling
+ *
+ * @ingroup ddc_fft
  */
 template <typename DDimFx, typename DDimX>
 DDimFx::template Impl<DDimFx, Kokkos::HostSpace> init_fourier_space(
@@ -282,6 +292,9 @@ DDimFx::template Impl<DDimFx, Kokkos::HostSpace> init_fourier_space(
  * Compute the Fourier (or spectral) mesh on which the Discrete Fourier Transform of a
  * discrete function is defined.
  *
+ * @tparam DDimFx... The Fourier discrete dimensions of the returned domain, one per original
+ * dimension.
+ *
  * @param x_mesh The DiscreteDomain representing the original mesh.
  * @param C2C A flag indicating if a complex-to-complex DFT is going to be performed. Indeed,
  * in this case the two meshes have same number of points, whereas for real-to-complex
@@ -290,6 +303,8 @@ DDimFx::template Impl<DDimFx, Kokkos::HostSpace> init_fourier_space(
  * values are needed (cf. DFT conjugate symmetry property for more information about this).
  *
  * @return The domain representing the Fourier mesh.
+ *
+ * @ingroup ddc_fft
  */
 template <typename... DDimFx, typename... DDimX>
 ddc::DiscreteDomain<DDimFx...> fourier_mesh(ddc::DiscreteDomain<DDimX...> x_mesh, bool C2C)
@@ -313,6 +328,8 @@ ddc::DiscreteDomain<DDimFx...> fourier_mesh(ddc::DiscreteDomain<DDimX...> x_mesh
  * @brief A structure embedding the configuration of the exposed FFT function with the type of normalization.
  *
  * @see fft, ifft
+ *
+ * @ingroup ddc_fft
  */
 struct kwArgs_fft
 {
@@ -326,20 +343,17 @@ struct kwArgs_fft
  * Compute the discrete Fourier transform of a function using the specialized implementation for the Kokkos::ExecutionSpace
  * of the FFT algorithm.
  *
- * @tparam Tin The type of the input elements (float, Kokkos::complex<float>, double or Kokkos::complex<double>).
- * @tparam Tout The type of the output elements (Kokkos::complex<float> or Kokkos::complex<double>).
- * @tparam DDimFx... The parameter pack of the Fourier discrete dimensions.
- * @tparam DDimX... The parameter pack of the original discrete dimensions.
- * @tparam ExecSpace The type of the Kokkos::ExecutionSpace on which the FFT is performed. It determines which specialized
- * backend is used (ie. fftw, cuFFT...).
- * @tparam MemorySpace The type of the Kokkos::MemorySpace on which are stored the input and output discrete functions.
- * @tparam LayoutIn The layout of the Chunkspan representing the input discrete function.
- * @tparam LayoutOut The layout of the Chunkspan representing the output discrete function.
- *
  * @param exec_space The Kokkos::ExecutionSpace on which the FFT is performed.
  * @param out The output discrete function, represented as a ChunkSpan storing values on a spectral mesh.
  * @param in The input discrete function, represented as a ChunkSpan storing values on a mesh.
  * @param kwargs The kwArgs_fft configuring the FFT.
+ *
+ * @pre The layouts of `in` and `out` must be `Kokkos::layout_right` (`static_assert`).
+ * @pre The original dimensions must derive from UniformPointSampling and the Fourier dimensions
+ *      from PeriodicSampling (`static_assert`).
+ * @pre The memory space must be accessible from `exec_space` (`static_assert`).
+ *
+ * @ingroup ddc_fft
  */
 template <
         typename Tin,
@@ -379,20 +393,17 @@ void fft(
  *
  * @warning C2R iFFT does NOT preserve input.
  *
- * @tparam Tin The type of the input elements (Kokkos::complex<float> or Kokkos::complex<double>).
- * @tparam Tout The type of the output elements (float, Kokkos::complex<float>, double or Kokkos::complex<double>).
- * @tparam DDimX... The parameter pack of the original discrete dimensions.
- * @tparam DDimFx... The parameter pack of the Fourier discrete dimensions.
- * @tparam ExecSpace The type of the Kokkos::ExecutionSpace on which the iFFT is performed. It determines which specialized
- * backend is used (ie. fftw, cuFFT...).
- * @tparam MemorySpace The type of the Kokkos::MemorySpace on which are stored the input and output discrete functions.
- * @tparam LayoutIn The layout of the Chunkspan representing the input discrete function.
- * @tparam LayoutOut The layout of the Chunkspan representing the output discrete function.
- *
  * @param exec_space The Kokkos::ExecutionSpace on which the iFFT is performed.
  * @param out The output discrete function, represented as a ChunkSpan storing values on a mesh.
  * @param in The input discrete function, represented as a ChunkSpan storing values on a spectral mesh.
  * @param kwargs The kwArgs_fft configuring the iFFT.
+ *
+ * @pre The layouts of `in` and `out` must be `Kokkos::layout_right` (`static_assert`).
+ * @pre The original dimensions must derive from UniformPointSampling and the Fourier dimensions
+ *      from PeriodicSampling (`static_assert`).
+ * @pre The memory space must be accessible from `exec_space` (`static_assert`).
+ *
+ * @ingroup ddc_fft
  */
 template <
         typename Tin,

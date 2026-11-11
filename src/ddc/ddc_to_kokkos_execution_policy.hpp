@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Internal helper converting DDC extents into a Kokkos execution policy.
+
 #pragma once
 
 #include <array>

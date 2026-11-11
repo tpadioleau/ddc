@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Parallel copy between chunks, supporting transposition and broadcasting.
+
 #pragma once
 
 #include <cassert>
@@ -72,6 +75,18 @@ CopyKokkosLambdaAdapter(ChunkSpanDst const& dst, ChunkSpanSrc const& src)
  * @param[out] dst the borrowed chunk in which to copy
  * @param[in]  src the borrowed chunk from which to copy
  * @return dst as a ChunkSpan
+ *
+ * If the domains of `dst` and `src` have the same type, a `Kokkos::deep_copy` of the allocation
+ * views on `execution_space` is performed. Otherwise a `Kokkos::parallel_for` over the domain of
+ * `dst` is used, labelled "ddc_copy_default".
+ *
+ * @pre The memory spaces of `dst` and `src` must be accessible from `execution_space`
+ *      (`static_assert`).
+ * @pre The element type of `src` must be assignable to the one of `dst` (`static_assert`).
+ * @pre The domain of `src` must be equal to the domain of `dst` restricted to the dimensions of
+ *      `src` (checked by `assert`).
+ *
+ * @ingroup ddc_algorithms
 */
 template <class ExecSpace, concepts::borrowed_chunk ChunkDst, concepts::borrowed_chunk ChunkSrc>
 auto parallel_copy(ExecSpace const& execution_space, ChunkDst&& dst, ChunkSrc&& src)

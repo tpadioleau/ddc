@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Experimental parallel inclusive and exclusive scans along one dimension of a chunk.
+
 #pragma once
 
 #include <string>
@@ -20,6 +23,13 @@
 
 namespace ddc::experimental {
 
+//! @brief Experimental tag object selecting the dimension(s) along which an algorithm operates.
+//!
+//! @details Used by ddc::experimental::parallel_transform_inclusive_scan and
+//! ddc::experimental::parallel_transform_exclusive_scan, which accept a single dimension.
+//!
+//! @tparam Tags The discrete dimensions selected.
+//! @ingroup ddc_experimental
 template <concepts::discrete_dimension... Tags>
 struct Dims
 {
@@ -146,6 +156,26 @@ void parallel_transform_scan(
 
 } // namespace detail
 
+//! @brief Experimental parallel inclusive scan of a transformed chunk along one dimension.
+//!
+//! @details For each element of the batch dimensions (the dimensions of `out` other than `DDim`)
+//! the elements along `DDim` are scanned with `Kokkos::parallel_scan`, the batch elements being
+//! processed one after the other. The value stored in `out` at a given position is the reduction
+//! with `reduce` of the values `transform(batch_element, scan_element)`
+//! from the first element up to and including the current one, ordered along `DDim`.
+//!
+//! @param[in] label Name used to identify the underlying Kokkos parallel region.
+//! @param[in] execution_space Kokkos execution space on which the scan is executed.
+//! @param[in] dim_tag Object of type `ddc::experimental::Dims<DDim>` selecting the scan dimension.
+//! @param[out] out Borrowed chunk receiving the result of the scan, on the domain to scan.
+//! @param[in] reduce A DDC reducer (e.g. `ddc::reducer::sum<int>()`) providing the binary
+//!            operation, the identity and `value_type`.
+//! @param[in] transform A functor called with two arguments, the discrete element of the batch
+//!            dimensions followed by the discrete element along `DDim`, and returning a value
+//!            accepted by `reduce`.
+//!
+//! @note The function is `noexcept` and does not itself fence.
+//! @ingroup ddc_experimental
 template <
         class ExecSpace,
         concepts::discrete_dimension DDim,
@@ -170,6 +200,27 @@ void parallel_transform_inclusive_scan(
             transform);
 }
 
+//! @brief Experimental parallel exclusive scan of a transformed chunk along one dimension.
+//!
+//! @details For each element of the batch dimensions (the dimensions of `out` other than `DDim`)
+//! the elements along `DDim` are scanned with `Kokkos::parallel_scan`, the batch elements being
+//! processed one after the other. The value stored in `out` at a given position is the reduction
+//! with `reduce` of the values `transform(batch_element, scan_element)`
+//! from the first element up to, but excluding, the current one, ordered along `DDim`.
+//! The first element along `DDim` receives the identity of `reduce`.
+//!
+//! @param[in] label Name used to identify the underlying Kokkos parallel region.
+//! @param[in] execution_space Kokkos execution space on which the scan is executed.
+//! @param[in] dim_tag Object of type `ddc::experimental::Dims<DDim>` selecting the scan dimension.
+//! @param[out] out Borrowed chunk receiving the result of the scan, on the domain to scan.
+//! @param[in] reduce A DDC reducer (e.g. `ddc::reducer::sum<int>()`) providing the binary
+//!            operation, the identity and `value_type`.
+//! @param[in] transform A functor called with two arguments, the discrete element of the batch
+//!            dimensions followed by the discrete element along `DDim`, and returning a value
+//!            accepted by `reduce`.
+//!
+//! @note The function is `noexcept` and does not itself fence.
+//! @ingroup ddc_experimental
 template <
         class ExecSpace,
         concepts::discrete_dimension DDim,

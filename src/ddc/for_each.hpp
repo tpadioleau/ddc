@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Serial iteration over a domain, on the host or inside a Kokkos function.
+
 #pragma once
 
 #include <array>
@@ -55,6 +58,11 @@ KOKKOS_FUNCTION void device_for_each_serial(
 /** iterates over a nD domain in serial
  * @param[in] domain the domain over which to iterate
  * @param[in] f      a functor taking an index as parameter
+ *
+ * The elements are visited in lexicographic order: the last dimension of the domain varies the
+ * fastest. The functor is called with the discrete element of the domain at each position.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class Support, class Functor>
 void host_for_each(Support const& domain, Functor&& f) noexcept
@@ -65,6 +73,11 @@ void host_for_each(Support const& domain, Functor&& f) noexcept
 /** iterates over a nD domain in serial
  * @param[in] domain the domain over which to iterate
  * @param[in] f      a functor taking an index as parameter
+ *
+ * Same as ddc::host_for_each, but it is a `KOKKOS_FUNCTION`: it can be called from code running
+ * on a device (the functor must then be callable there too).
+ *
+ * @ingroup ddc_algorithms
  */
 template <class Support, class Functor>
 KOKKOS_FUNCTION void device_for_each(Support const& domain, Functor&& f) noexcept

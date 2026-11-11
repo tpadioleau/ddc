@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Iteration over the blocks obtained by splitting a domain.
+
 #pragma once
 
 #include <array>
@@ -67,6 +70,12 @@ void host_for_each_block(
  * @pre For each dimension D:
  *      get<D>(nb_blocks_per_dim) > 0 and
  *      get<D>(nb_blocks_per_dim) <= domain.extent<D>()
+ *
+ * The blocks are sub-domains of the same type as `domain`. Along each dimension the extents of
+ * the blocks differ by at most one element, the first blocks being the larger ones. The blocks
+ * are visited in lexicographic order (the last dimension varies the fastest) and serially.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class Support, class Functor>
 void host_for_each_block(
@@ -87,6 +96,17 @@ void host_for_each_block(
  * @param[in] f Functor applied to each block.
  *
  * @pre nb_blocks must be a power of 2.
+ *
+ * The number of blocks is distributed over the dimensions by repeatedly doubling the number of
+ * blocks of the first dimension whose extent can still accommodate it, so the first dimensions
+ * are split first. The blocks are then visited as in the overload taking a number of blocks per
+ * dimension.
+ *
+ * @warning The function is `noexcept` while the distribution of the blocks throws a
+ * `std::runtime_error` if `nb_blocks` is not a power of 2 or if it is too large for the number of
+ * elements of the domain, in which case `std::terminate` is called.
+ *
+ * @ingroup ddc_algorithms
 */
 template <class Support, class Functor>
 void host_for_each_block(Support const& domain, std::size_t nb_blocks, Functor const& f) noexcept

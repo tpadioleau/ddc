@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Parallel in-place transformation of the elements of a chunk.
+
 #pragma once
 
 #include <string>
@@ -53,6 +56,11 @@ public:
  * @param[in] transform a unary FunctionObject that will be applied to each element of the input
  *            range. The return type must be assignable to dst
  * @return dst as a ChunkSpan
+ *
+ * Each element of `dst` is replaced in place by the result of `transform` applied to its current
+ * value. The functor must be callable from the execution space.
+ *
+ * @ingroup ddc_algorithms
  */
 template <concepts::borrowed_chunk ChunkDst, class UnaryTransformOp>
 auto parallel_transform(std::string const& label, ChunkDst&& dst, UnaryTransformOp&& transform)
@@ -71,6 +79,11 @@ auto parallel_transform(std::string const& label, ChunkDst&& dst, UnaryTransform
  * @param[in] transform a unary FunctionObject that will be applied to each element of the input
  *            range. The return type must be assignable to dst
  * @return dst as a ChunkSpan
+ *
+ * Each element of `dst` is replaced in place by the result of `transform` applied to its current
+ * value. The functor must be callable from the execution space.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class ChunkDst, class UnaryTransformOp>
 auto parallel_transform(ChunkDst&& dst, UnaryTransformOp&& transform)
@@ -85,6 +98,11 @@ auto parallel_transform(ChunkDst&& dst, UnaryTransformOp&& transform)
  * @param[in] transform a unary FunctionObject that will be applied to each element of the input
  *            range. The return type must be acceptable as input to reduce
  * @return dst as a ChunkSpan
+ *
+ * Each element of `dst` is replaced in place by the result of `transform` applied to its current
+ * value. The functor must be callable from the execution space.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class ExecSpace, concepts::borrowed_chunk ChunkDst, class UnaryTransformOp>
 auto parallel_transform(
@@ -108,6 +126,11 @@ auto parallel_transform(
  * @param[in] transform a unary FunctionObject that will be applied to each element of the input
  *            range. The return type must be acceptable as input to reduce
  * @return dst as a ChunkSpan
+ *
+ * Each element of `dst` is replaced in place by the result of `transform` applied to its current
+ * value. The functor must be callable from the execution space.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class ExecSpace, class ChunkDst, class UnaryTransformOp>
 auto parallel_transform(

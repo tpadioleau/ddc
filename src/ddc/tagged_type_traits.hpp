@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Trait combining the tags of several tagged types into a single type.
+
 #pragma once
 
 #include "discrete_dimension.hpp"
@@ -36,7 +39,9 @@ struct Combine<TaggedType<Tags...>, TaggedType<OTags...>, TaggedTypes...>
  *
  * E.g. combine_t<DiscreteElement<Tag1>, DiscreteElement<Tag2>> == DiscreteElement<Tag1, Tag2>
  *
- * @tparam Containers The Types that should be combined. They should differ only in the tags.
+ * @tparam TaggedTypes The Types that should be combined. They should differ only in the tags.
+ *
+ * @ingroup ddc_core_utils
  */
 template <class... TaggedTypes>
 using combine_t = detail::Combine<TaggedTypes...>::type;

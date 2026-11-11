@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Parallel copy between chunks having the same domain.
+
 #pragma once
 
 #include <cassert>
@@ -17,6 +20,15 @@ namespace ddc {
  * @param[out] dst the borrowed chunk in which to copy
  * @param[in]  src the borrowed chunk from which to copy
  * @return dst as a ChunkSpan
+ *
+ * The copy is performed by `Kokkos::deep_copy` on the allocation views, without an execution
+ * space instance.
+ *
+ * @pre The domains of `dst` and `src` must have the same type (`static_assert`) and be equal
+ *      (checked by `assert`).
+ * @pre The element type of `src` must be assignable to the one of `dst` (`static_assert`).
+ *
+ * @ingroup ddc_algorithms
 */
 template <concepts::borrowed_chunk ChunkDst, concepts::borrowed_chunk ChunkSrc>
 auto parallel_deepcopy(ChunkDst&& dst, ChunkSrc&& src)
@@ -35,6 +47,14 @@ auto parallel_deepcopy(ChunkDst&& dst, ChunkSrc&& src)
  * @param[out] dst the borrowed chunk in which to copy
  * @param[in]  src the borrowed chunk from which to copy
  * @return dst as a ChunkSpan
+ *
+ * The copy is performed by `Kokkos::deep_copy` on the allocation views, using `execution_space`.
+ *
+ * @pre The domains of `dst` and `src` must have the same type (`static_assert`) and be equal
+ *      (checked by `assert`).
+ * @pre The element type of `src` must be assignable to the one of `dst` (`static_assert`).
+ *
+ * @ingroup ddc_algorithms
 */
 template <class ExecSpace, concepts::borrowed_chunk ChunkDst, concepts::borrowed_chunk ChunkSrc>
 auto parallel_deepcopy(ExecSpace const& execution_space, ChunkDst&& dst, ChunkSrc&& src)

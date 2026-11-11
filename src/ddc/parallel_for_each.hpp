@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+//! @file
+//! @brief Parallel iteration over a domain using Kokkos.
+
 #pragma once
 
 #include <cstddef>
@@ -76,6 +79,13 @@ void for_each_kokkos(
  * @param[in] execution_space a Kokkos execution space where the loop will be executed on
  * @param[in] domain the domain over which to iterate
  * @param[in] f      a functor taking an index as parameter
+ *
+ * The functor is called once for each element of the domain, in an unspecified order and possibly
+ * concurrently, so it must be callable from the execution space (e.g. a `KOKKOS_LAMBDA`). A
+ * `Kokkos::RangePolicy` is used for a domain of rank 0 or 1, a `Kokkos::MDRangePolicy` otherwise.
+ * No fence is performed by this function.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class ExecSpace, class Support, class Functor>
 void parallel_for_each(
@@ -91,6 +101,13 @@ void parallel_for_each(
  * @param[in] execution_space a Kokkos execution space where the loop will be executed on
  * @param[in] domain the domain over which to iterate
  * @param[in] f      a functor taking an index as parameter
+ *
+ * The functor is called once for each element of the domain, in an unspecified order and possibly
+ * concurrently, so it must be callable from the execution space (e.g. a `KOKKOS_LAMBDA`). A
+ * `Kokkos::RangePolicy` is used for a domain of rank 0 or 1, a `Kokkos::MDRangePolicy` otherwise.
+ * No fence is performed by this function.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class ExecSpace, class Support, class Functor>
 void parallel_for_each(
@@ -110,6 +127,13 @@ void parallel_for_each(
  * @param[in] label  name for easy identification of the parallel_for_each algorithm
  * @param[in] domain the domain over which to iterate
  * @param[in] f      a functor taking an index as parameter
+ *
+ * The functor is called once for each element of the domain, in an unspecified order and possibly
+ * concurrently, so it must be callable from the execution space (e.g. a `KOKKOS_LAMBDA`). A
+ * `Kokkos::RangePolicy` is used for a domain of rank 0 or 1, a `Kokkos::MDRangePolicy` otherwise.
+ * No fence is performed by this function.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class Support, class Functor>
 void parallel_for_each(std::string const& label, Support const& domain, Functor&& f) noexcept
@@ -120,6 +144,13 @@ void parallel_for_each(std::string const& label, Support const& domain, Functor&
 /** iterates over a nD domain using the `Kokkos` default execution space
  * @param[in] domain the domain over which to iterate
  * @param[in] f      a functor taking an index as parameter
+ *
+ * The functor is called once for each element of the domain, in an unspecified order and possibly
+ * concurrently, so it must be callable from the execution space (e.g. a `KOKKOS_LAMBDA`). A
+ * `Kokkos::RangePolicy` is used for a domain of rank 0 or 1, a `Kokkos::MDRangePolicy` otherwise.
+ * No fence is performed by this function.
+ *
+ * @ingroup ddc_algorithms
  */
 template <class Support, class Functor>
 void parallel_for_each(Support const& domain, Functor&& f) noexcept
